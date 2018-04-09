@@ -1,6 +1,7 @@
 module Main where
 
 import Abilities
+import AbilitySelector
 import CharacterBuilder
 import Data.Either
 import Data.List
@@ -8,11 +9,11 @@ import Data.Maybe
 import Data.Tuple
 import Prelude
 import RaceSelector
-import AbilitySelector
 import Races
 import Skills
 
 import Background (Background)
+import BackgroundSelector
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import DOM (DOM) as DOM
@@ -41,8 +42,13 @@ initialState =
   , race : Nothing
   }
 
-spec :: T.Spec _ CharacterBuilder _ (Either AbilityAction RaceSelectorAction) 
-spec = T.match _Left abilitySpec <> T.match _Right raceSelectorSpec
+type CombinedAction = Either AbilityAction RaceSelectorAction
+
+specC1 :: T.Spec _ CharacterBuilder _ CombinedAction
+specC1 = T.match _Left abilitySpec <> T.match _Right raceSelectorSpec
+
+spec :: T.Spec _ CharacterBuilder _ (Either CombinedAction BackgroundSelectorAction)
+spec = T.match _Left specC1 <> T.match _Right backgroundSelectorSpec
 
 -- Renders the component by suppying the initial state
 main = T.defaultMain spec initialState unit
