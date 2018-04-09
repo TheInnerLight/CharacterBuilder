@@ -22,11 +22,20 @@ instance showAbility :: Show Ability where
 derive instance eqAbility :: Eq Ability
 derive instance ordAbility :: Ord Ability
 
-type PrimaryAbilities = 
+type BaseAbilities = 
     { strength :: Int
     , comprehension :: Int
     , agility :: Int
     , intuition :: Int 
+    }
+
+type DerivedAbilities = 
+    { strength :: Int
+    , comprehension :: Int
+    , agility :: Int
+    , intuition :: Int 
+    , health :: Int
+    , resolve :: Int
     }
 
 baseCostOfAbility :: Int -> Maybe Int

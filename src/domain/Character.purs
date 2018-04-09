@@ -10,7 +10,7 @@ import Background (Background)
 import Races (Race(..))
 
 type Character = 
-  { abilities :: PrimaryAbilities
+  { abilities :: DerivedAbilities
   , skills :: Map Skill Int
   , race :: Race
   , background :: Background

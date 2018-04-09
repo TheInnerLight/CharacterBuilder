@@ -17,35 +17,10 @@ import Thermite as T
 data RaceSelectorAction
   = SelectRace Race
 
-applyRacialStatBonus :: Race -> PrimaryAbilities -> PrimaryAbilities
-applyRacialStatBonus race pa =
-  foldl folder pa race.advantages
-  where 
-  folder acc (AbilityBonus Strength v) = acc {strength = acc.strength + v}
-  folder acc (AbilityBonus Agility v) = acc {agility = acc.agility + v}
-  folder acc (AbilityBonus Intuition v) = acc {intuition = acc.intuition + v}
-  folder acc (AbilityBonus Comprehension v) = acc {comprehension = acc.comprehension + v}
-  folder acc _ = acc
-
-unapplyRacialStatBonus :: Race -> PrimaryAbilities -> PrimaryAbilities
-unapplyRacialStatBonus race pa =
-  foldl folder pa race.advantages
-  where 
-  folder acc (AbilityBonus Strength v) = acc {strength = acc.strength - v}
-  folder acc (AbilityBonus Agility v) = acc {agility = acc.agility - v}
-  folder acc (AbilityBonus Intuition v) = acc {intuition = acc.intuition - v}
-  folder acc (AbilityBonus Comprehension v) = acc {comprehension = acc.comprehension - v}
-  folder acc _ = acc
-
-test :: Maybe Race -> PrimaryAbilities -> PrimaryAbilities
-test mrace pa = foldl (\acc race -> unapplyRacialStatBonus race pa) pa mrace
 
 performAction :: T.PerformAction _ CharacterBuilder _ RaceSelectorAction
 performAction (SelectRace race) _ _ = void do
-  T.modifyState (\state -> state 
-    { race = Just race
-    , abilities = applyRacialStatBonus race $ foldl (\acc race -> unapplyRacialStatBonus race acc) state.abilities state.race
-    } )
+  T.modifyState (\state -> state { race = Just race } )
 
 optionElementFromRace :: (RaceSelectorAction -> T.EventHandler) -> Race -> ReactElement
 optionElementFromRace dispatch race = 
