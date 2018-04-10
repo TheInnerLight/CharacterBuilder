@@ -2,6 +2,7 @@ module AbilitySelector where
   
 import Abilities
 import CharacterBuilder
+import Data.Maybe
 import Data.Foldable
 import Data.List
 import Prelude
@@ -18,36 +19,24 @@ data AbilityAction
   | DecreaseAbilityScore Ability
 
 isIncreasable :: Ability -> CharacterBuilder -> Boolean
-isIncreasable ability cb = abilityScore ability cb.abilities < 5
+isIncreasable ability cb = (abilityScore ability cb.abilities < 5 ) && increasableAfterChange
+  where
+  increasableAfterChange = fromMaybe false $ map (\x -> x >= 0) abilityPointsAfterChange
+  abilityPointsAfterChange = remainingAbilityPoints $ transformAbility ability (\x -> x + 1) cb
 
 isDecreasable :: Ability -> CharacterBuilder -> Boolean
 isDecreasable ability cb = abilityScore ability cb.abilities > 2
 
 performAction :: T.PerformAction _ CharacterBuilder _ AbilityAction
-performAction (IncreaseAbilityScore Strength) _ _ = void do
-  T.modifyState (\state -> state { abilities { strength = state.abilities.strength + 1} } )
-performAction (DecreaseAbilityScore Strength) _ _ = void do
-  T.modifyState (\state -> state { abilities { strength = state.abilities.strength - 1} } )
-performAction (IncreaseAbilityScore Agility) _ _ = void do
-  T.modifyState (\state -> state { abilities { agility = state.abilities.agility + 1} } )
-performAction (DecreaseAbilityScore Agility) _ _ = void do
-  T.modifyState (\state -> state { abilities { agility = state.abilities.agility - 1} } )
-performAction (IncreaseAbilityScore Comprehension) _ _ = void do
-  T.modifyState (\state -> state { abilities { comprehension = state.abilities.comprehension + 1} } )
-performAction (DecreaseAbilityScore Comprehension) _ _ = void do
-  T.modifyState (\state -> state { abilities { comprehension = state.abilities.comprehension - 1} } )
-performAction (IncreaseAbilityScore Intuition) _ _ = void do
-  T.modifyState (\state -> state { abilities { intuition = state.abilities.intuition + 1} } )
-performAction (DecreaseAbilityScore Intuition) _ _ = void do
-  T.modifyState (\state -> state { abilities { intuition = state.abilities.intuition - 1} } )
-performAction _ _ _ = void do
-  pure unit
+performAction (IncreaseAbilityScore ability) _ _ = void do
+  T.modifyState $ transformAbility ability (\x -> x + 1)
+performAction (DecreaseAbilityScore ability) _ _ = void do
+  T.modifyState $ transformAbility ability (\x -> x - 1)
   
 render :: T.Render CharacterBuilder _ _
 render dispatch _ state _ =
   [ R.p [ RP.className "Abilities"]
-    [ R.text "Remaining Ability Points: "
-      , R.text $ show $ remainingAbilityPoints state
+    [ R.p' [ R.text "Remaining Ability Points: ", R.text remainingAbilityPointText ]
       , R.p [ RP.className "Strength" ] 
           [ 
           R.text     $ "Strength: "
@@ -105,6 +94,9 @@ render dispatch _ state _ =
     ]
   ]
   where 
+  remainingAbilityPointText = case remainingAbilityPoints state of
+    Just x -> show x
+    Nothing -> "----"
   derivedAbilities = calculateDerivedAbilities state
 
 abilitySpec :: T.Spec _ CharacterBuilder _ AbilityAction

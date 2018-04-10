@@ -34,6 +34,21 @@ derivedSkills cb =
   backgroundSkillSet (Nothing) = SM.empty
   backgroundSkillSet (Just background) = background.startingSkills
 
+transformAbility :: Ability -> (Int -> Int) -> CharacterBuilder -> CharacterBuilder
+transformAbility Strength f cb =
+  cb { abilities { strength = f cb.abilities.strength} }
+transformAbility Agility f cb =
+  cb { abilities { agility = f cb.abilities.agility} }
+transformAbility Comprehension f cb =
+  cb { abilities { comprehension = f cb.abilities.comprehension} }
+transformAbility Intuition f cb =
+  cb { abilities { intuition = f cb.abilities.intuition} }
+transformAbility _ _ cb = cb
+
+transformSkill :: Skill -> Maybe String -> (Int -> Int) -> CharacterBuilder -> CharacterBuilder
+transformSkill skill maybeSubskill f cb =
+  cb { skills = SM.update skill maybeSubskill (f) cb.skills }
+
 applyRacialStatBonus :: Race -> DerivedAbilities -> DerivedAbilities
 applyRacialStatBonus race pa =
   foldl folder pa race.advantages
