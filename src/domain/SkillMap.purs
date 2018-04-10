@@ -24,3 +24,17 @@ relatedSkills skill value = Tuple skill (M.fromFoldable $ map (\(Tuple k v) -> T
 
 merge :: SkillMap -> SkillMap -> SkillMap
 merge sm1 sm2 = M.unionWith (M.unionWith (\s1 s2 -> s1 + s2)) sm1 sm2
+
+update :: Skill -> Maybe String -> (Int -> Int) -> SkillMap -> SkillMap 
+update skill maybeString f skillMap = M.update (\m -> Just $ updateInternal m) skill skillMap
+  where
+  updateInternal subSkillMap = M.alter (updater $ f) maybeString subSkillMap
+  updater f (Just x) = Just $ f x
+  updater f (Nothing) = Just $ f 0
+
+getSkillValue :: Skill -> Maybe String -> SkillMap -> Maybe Int
+getSkillValue skill maybeString skillMap = do 
+  subSkillMap <- M.lookup skill skillMap
+  value <- M.lookup maybeString subSkillMap
+  Just value
+

@@ -3,10 +3,10 @@ module Races where
 import Data.Tuple
 import Data.Tuple.Nested
 import Prelude
+import Skills
 
 import Abilities (Ability(..))
-import Data.Map as Map
-import Skills
+import Data.Map as M
 
 data Advantage 
   = AbilityBonus Ability Int
@@ -29,7 +29,7 @@ instance showDisadvantage :: Show Disadvantage where
   show IllegalGeneticStatus = "There may be negative consequences if your genetic status is discovered."
 
 type Race =
-  { skillBoundaries :: Array (Tuple Skill (Tuple3 Int Int Int))
+  { skillBoundaries :: M.Map Skill (Tuple3 Int Int Int)
   , fate :: Int
   , advantages :: Array Advantage
   , disadvantages :: Array Disadvantage
@@ -42,6 +42,7 @@ increasedBy x = tuple3 (3 + x) (6 + x) (9 + x)
 andorian :: Race 
 andorian = 
   { skillBoundaries :
+    M.fromFoldable
     [ Tuple art           (increasedBy 1)
     , Tuple academics     (increasedBy 1)
     , Tuple protocol      (increasedBy 1)]
@@ -53,7 +54,7 @@ andorian =
 
 android :: Race 
 android =
-  { skillBoundaries : []
+  { skillBoundaries : M.fromFoldable []
   , fate : 1
   , advantages : [AbilityBonus Strength 1, AbilityBonus Comprehension 1, AbilityBonus Health 1, Unreadable]
   , disadvantages : []
@@ -63,6 +64,7 @@ android =
 bajoran :: Race 
 bajoran =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple art           (increasedBy 1)
     , Tuple academics     (increasedBy 1)
     , Tuple athletics     (increasedBy 1)]
@@ -74,7 +76,7 @@ bajoran =
 
 betazoid :: Race 
 betazoid =
-  { skillBoundaries : []
+  { skillBoundaries : M.fromFoldable []
   , fate : 2
   , advantages : [Telepathy]
   , disadvantages : []
@@ -83,7 +85,8 @@ betazoid =
 
 benzite :: Race 
 benzite =
-  { skillBoundaries : 
+  { skillBoundaries :
+    M.fromFoldable 
     [ Tuple investigation (increasedBy 1)
     , Tuple protocol      (increasedBy 1)
     , Tuple research      (increasedBy 1)]
@@ -96,6 +99,7 @@ benzite =
 bolian :: Race 
 bolian =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple art           (increasedBy 1)
     , Tuple perception    (increasedBy 1)
     , Tuple persuasion    (increasedBy 1)]
@@ -108,6 +112,7 @@ bolian =
 cairn :: Race 
 cairn =
   { skillBoundaries :  
+    M.fromFoldable
     [ Tuple perception    (increasedBy 1)]
   , fate : 2
   , advantages : [Telepathy]
@@ -118,6 +123,7 @@ cairn =
 cardassian :: Race 
 cardassian =
   { skillBoundaries :  
+    M.fromFoldable
     [ Tuple deception     (increasedBy 1)
     , Tuple profession    (increasedBy 1)
     , Tuple investigation (increasedBy 1)]
@@ -130,6 +136,7 @@ cardassian =
 deltan :: Race 
 deltan =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple academics     (increasedBy 1)
     , Tuple art           (increasedBy 1)]
   , fate : 1
@@ -141,6 +148,7 @@ deltan =
 efrosian :: Race
 efrosian =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple melee         (increasedBy 1)
     , Tuple profession    (increasedBy 1)]
   , fate : 2
@@ -152,6 +160,7 @@ efrosian =
 ferengi :: Race
 ferengi =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple profession    (increasedBy 1)
     , Tuple perception    (increasedBy 2)]
   , fate : 3
@@ -163,6 +172,7 @@ ferengi =
 grazerite :: Race
 grazerite =
   { skillBoundaries :
+    M.fromFoldable
     [ Tuple profession    (increasedBy 1)
     , Tuple perception    (increasedBy 1)
     , Tuple protocol      (increasedBy 1)]
@@ -175,6 +185,7 @@ grazerite =
 human :: Race
 human =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple profession    (increasedBy 1)
     , Tuple protocol      (increasedBy 1)
     , Tuple research      (increasedBy 1)]
@@ -186,7 +197,7 @@ human =
 
 geneticallyEngineeredHuman :: Race
 geneticallyEngineeredHuman =
-  { skillBoundaries : []
+  { skillBoundaries : M.fromFoldable []
   , fate : 2
   , advantages : [AnyAbilityBonus 2]
   , disadvantages : [IllegalGeneticStatus]
@@ -196,6 +207,7 @@ geneticallyEngineeredHuman =
 klingon :: Race
 klingon =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple athletics     (increasedBy 1)
     , Tuple gunnery       (increasedBy 1)
     , Tuple melee         (increasedBy 1)]
@@ -208,6 +220,7 @@ klingon =
 romulan :: Race
 romulan =
   { skillBoundaries :  
+    M.fromFoldable
     [ Tuple academics     (increasedBy 1)
     , Tuple deception     (increasedBy 1)
     , Tuple investigation (increasedBy 1)]
@@ -220,6 +233,7 @@ romulan =
 tellarite :: Race
 tellarite =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple engineering   (increasedBy 1)
     , Tuple profession    (increasedBy 1)]
   , fate : 3
@@ -231,6 +245,7 @@ tellarite =
 trill :: Race
 trill =
   { skillBoundaries : 
+    M.fromFoldable
     [ Tuple academics     (increasedBy 1)
     , Tuple profession    (increasedBy 1)]
   , fate : 3
@@ -242,6 +257,7 @@ trill =
 joinedTrill :: Race
 joinedTrill =
   { skillBoundaries :
+    M.fromFoldable
     [ Tuple academics     (increasedBy 1)
     , Tuple profession    (increasedBy 1)]
   , fate : 1
@@ -253,6 +269,7 @@ joinedTrill =
 vulcan :: Race 
 vulcan =
   { skillBoundaries :
+    M.fromFoldable
     [ Tuple academics     (increasedBy 1)]
   , fate : 1
   , advantages : [AbilityBonus Strength 1, AbilityBonus Comprehension 1, AbilityBonus Resolve 1]
@@ -263,6 +280,7 @@ vulcan =
 zakdorn :: Race
 zakdorn = 
   { skillBoundaries :
+    M.fromFoldable
     [ Tuple investigation (increasedBy 1)
     , Tuple perception    (increasedBy 1)
     , Tuple profession    (increasedBy 1)]

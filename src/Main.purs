@@ -18,14 +18,14 @@ import Background (Background)
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE, log)
 import DOM (DOM) as DOM
-import SkillMap as SM
 import Data.Lens (_Left, _Right)
-import Data.Map as Map
+import Data.Map as M
 import Data.Set as S
 import React as R
 import React.DOM as R
 import React.DOM.Props as RP
 import ReactDOM as RDOM
+import SkillMap as SM
 import Thermite as T
 
 data BuilderAction 
@@ -35,12 +35,19 @@ data BuilderAction
   | IncreaseSkill Skill
   | DecreaseSkill Skill
 
+initialSkills :: SM.SkillMap
+initialSkills =
+  M.fromFoldable $ map (\(Skill skill) -> createSkill skill.skillType (Skill skill)) skills
+  where
+  createSkill SingleValue skill = SM.singleSkill skill 0
+  createSkill FieldSpecific skill = SM.relatedSkills skill M.empty
+
 initialState :: CharacterBuilder
 initialState = 
   { abilityPoints : 10
   , skillPoints  : 40
   , abilities : {strength : 2, comprehension : 2, intuition : 2, agility : 2}
-  , skills : SM.empty
+  , skills : initialSkills
   , background : Nothing
   , race : Nothing
   }

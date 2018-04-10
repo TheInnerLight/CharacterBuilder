@@ -1,8 +1,8 @@
 module BackgroundSelector where
 
+import Data.Array as A
 import Data.Maybe
 import Prelude
-
 import Background 
 import CharacterBuilder (CharacterBuilder)
 import React (ReactElement)
@@ -13,15 +13,15 @@ import ReactDOM as RDOM
 import Thermite as T
 
 data BackgroundSelectorAction
-  = SelectBackground Background
+  = SelectBackground (Maybe Background)
 
 performAction :: T.PerformAction _ CharacterBuilder _ BackgroundSelectorAction
-performAction (SelectBackground background) _ _ = void do
-  T.modifyState (\state -> state { background = Just background} )
+performAction (SelectBackground maybeBackground) _ _ = void do
+  T.modifyState (\state -> state { background = maybeBackground} )
 
 optionElementFromBackground :: (BackgroundSelectorAction -> T.EventHandler) -> Background -> ReactElement
 optionElementFromBackground dispatch background = 
-  R.option [ RP.onClick \_ -> dispatch (SelectBackground background)]
+  R.option [ RP.onClick \_ -> dispatch (SelectBackground $ Just background)]
            [ R.text (background.name)]
 
 backgroundSelector :: T.Render CharacterBuilder _ _
@@ -29,7 +29,12 @@ backgroundSelector dispatch _ state _ =
   [ R.p [ RP.className "Background"]
       [ R.text "Background: "
         , R.select [RP.className "BackgroundSelector"]
-        (map (optionElementFromBackground dispatch) backgrounds)
+        (A.concat [
+            [ R.option [ RP.onClick \_ -> dispatch (SelectBackground $ Nothing)]
+                     [ R.text ("----")]
+            ]
+            , map (optionElementFromBackground dispatch) backgrounds]
+        )
       ]
   ]
 

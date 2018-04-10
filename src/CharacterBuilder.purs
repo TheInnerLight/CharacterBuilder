@@ -4,14 +4,19 @@ import Abilities
 import Data.List
 import Data.Maybe
 import Data.Tuple
+import Data.Tuple.Nested
 import Prelude
 import Races
 import Skills
-import SkillMap as SM
+
 import Background (Background)
+import DOM.HTML.HTMLElement (offsetHeight)
 import Data.Array as A
 import Data.Map as M
 import Data.Set as S
+import React.DOM.Props (x)
+import SkillMap (mapToArray)
+import SkillMap as SM
 
 type CharacterBuilder = 
   { abilityPoints :: Int
@@ -61,3 +66,26 @@ remainingAbilityPoints cb = do
   intCost <- baseCostOfAbility cb.abilities.intuition 
   agCost <- baseCostOfAbility cb.abilities.agility
   Just (cb.abilityPoints - strCost - compCost - intCost - agCost)
+
+costOfSkill :: Skill -> Int -> M.Map Skill (Tuple3 Int Int Int) -> Maybe Int
+costOfSkill skill value modifiedBoundaries =
+  case value of
+    v | v < get1 boundaries -> Just v
+    v | v < get2 boundaries -> Just (get1 boundaries + (v - get1 boundaries) * 2 )
+    v | v < get3 boundaries -> Just (get1 boundaries + (get2 boundaries - get1 boundaries) * 2 + (v - get2 boundaries) * 3  )
+    v -> Just (get1 boundaries + (get2 boundaries - get1 boundaries) * 2 + (get3 boundaries - get2 boundaries) * 3 + (v - get3 boundaries) * 4 )
+  where
+  boundaries = fromMaybe (tuple3 3 6 9) (M.lookup skill modifiedBoundaries)
+
+remainingSkillPoints :: CharacterBuilder -> Maybe Int
+remainingSkillPoints cb = do
+  cost <- foldl (folder) (Just 0) skillList
+  Just $ cb.skillPoints - cost
+  where
+  folder acc (Tuple skill value) = do 
+    accuCost <- acc
+    cost <- costOfSkill skill value skillBoundaries
+    Just $ accuCost + cost
+  --folder acc (Tuple skill value) = costOfSkill skill value skillBoundaries
+  skillBoundaries = fromMaybe M.empty $ map (\r -> r.skillBoundaries) cb.race 
+  skillList = foldl (\acc (Tuple k v) -> append (map (Tuple k) (M.values v)) acc) Nil $ mapToArray cb.skills

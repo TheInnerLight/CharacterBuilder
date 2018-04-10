@@ -2,6 +2,8 @@ module RaceSelector where
 
 import Prelude
 import Abilities
+import Data.Array as A
+import Data.Maybe
 import Data.Foldable
 import Data.Maybe
 import Prelude
@@ -15,16 +17,16 @@ import ReactDOM as RDOM
 import Thermite as T
 
 data RaceSelectorAction
-  = SelectRace Race
+  = SelectRace (Maybe Race)
 
 
 performAction :: T.PerformAction _ CharacterBuilder _ RaceSelectorAction
-performAction (SelectRace race) _ _ = void do
-  T.modifyState (\state -> state { race = Just race } )
+performAction (SelectRace maybeRace) _ _ = void do
+  T.modifyState (\state -> state { race = maybeRace } )
 
 optionElementFromRace :: (RaceSelectorAction -> T.EventHandler) -> Race -> ReactElement
 optionElementFromRace dispatch race = 
-  R.option [ RP.onClick \_ -> dispatch (SelectRace race)]
+  R.option [ RP.onClick \_ -> dispatch (SelectRace $ Just race)]
            [ R.text (race.name)]
 
 raceSelector :: T.Render CharacterBuilder _ _
@@ -32,7 +34,13 @@ raceSelector dispatch _ state _ =
   [ R.p [ RP.className "Race"]
       [ R.text "Race: "
         , R.select [RP.className "RaceSelector"]
-        (map (optionElementFromRace dispatch) races)
+        (A.concat [
+            [ R.option [ RP.onClick \_ -> dispatch (SelectRace $ Nothing)]
+                     [ R.text ("----")]
+            ]
+            , map (optionElementFromRace dispatch) races]
+        )
+        
       ]
   ]
 
