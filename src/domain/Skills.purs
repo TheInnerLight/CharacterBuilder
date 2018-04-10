@@ -1,127 +1,129 @@
 module Skills where
 
-import Prelude
 import Abilities
+import Data.Newtype
+import Data.Map
+import Prelude
 
 data SkillType 
-    = FieldSpecific String 
-    | Single
-
-data SkillName
-    = Academics
-    | Acrobatics
-    | Art
-    | Athletics
-    | Deception
-    | Demolitions
-    | Disguise
-    | Engineering
-    | Gunnery
-    | Interest
-    | Investigation
-    | Language
-    | Medicine
-    | Melee
-    | Navigation
-    | Operations
-    | Perception
-    | Persuasion
-    | Pilot
-    | Profession
-    | Programming
-    | Protocol
-    | RangedWeapons
-    | Research
-    | Stealth
-    | ThrownWeapons
+  = FieldSpecific
+  | SingleValue
 
 newtype Skill = Skill
-    { name :: SkillName
-    , type :: SkillType
-    , ability :: Ability
-    }
+  { name :: String
+  , skillType :: SkillType
+  , ability :: Ability
+  }
 
-derive instance eqSkillName :: Eq SkillName
-derive instance ordSkillName :: Ord SkillName
-derive instance eqSkillType :: Eq SkillType
-derive instance ordSkillType :: Ord SkillType
+derive instance newtypeSkill :: Newtype Skill _
 derive instance eqSkill :: Eq Skill
 derive instance ordSkill :: Ord Skill
+derive instance eqSkillType :: Eq SkillType
+derive instance ordSkillType :: Ord SkillType
 
-academics :: String -> Skill
-academics name = Skill { name : Academics, type : FieldSpecific name, ability : Comprehension }
+academics :: Skill
+academics = Skill { name : "Academics", skillType : FieldSpecific, ability : Comprehension }
 
 acrobatics :: Skill
-acrobatics = Skill { name : Acrobatics, type : Single, ability : Agility }
+acrobatics = Skill { name : "Acrobatics", skillType : SingleValue, ability : Agility }
 
-art :: String -> Skill
-art name = Skill { name : Art, type : FieldSpecific name, ability : Intuition }
+art :: Skill
+art = Skill { name : "Art", skillType : FieldSpecific, ability : Intuition }
 
 athletics :: Skill
-athletics = Skill { name : Athletics, type : Single, ability : Strength }
+athletics = Skill { name : "Athletics", skillType : SingleValue, ability : Strength }
 
 deception :: Skill
-deception = Skill { name : Deception, type : Single, ability : Intuition }
+deception = Skill { name : "Deception", skillType : SingleValue, ability : Intuition }
 
 demolitions :: Skill
-demolitions = Skill { name : Demolitions, type : Single, ability : Comprehension }
+demolitions = Skill { name : "Demolitions", skillType : SingleValue, ability : Comprehension }
 
-diguise :: Skill
-diguise = Skill { name : Disguise, type : Single, ability : Intuition }
+disguise :: Skill
+disguise = Skill { name : "Disguise", skillType : SingleValue, ability : Intuition }
 
-engineering :: String -> Skill
-engineering name = Skill { name : Engineering, type : FieldSpecific name, ability : Comprehension }
+engineering :: Skill
+engineering = Skill { name : "Engineering", skillType : FieldSpecific, ability : Comprehension }
 
 gunnery :: Skill
-gunnery = Skill { name : Gunnery, type : Single, ability : Intuition }
+gunnery = Skill { name : "Gunnery", skillType : SingleValue, ability : Intuition }
 
-interest :: String -> Skill
-interest name = Skill { name : Interest, type : FieldSpecific name, ability : Comprehension }
+interest :: Skill
+interest = Skill { name : "Interest", skillType : FieldSpecific, ability : Comprehension }
 
 investigation :: Skill
-investigation = Skill { name : Investigation, type : Single, ability : Intuition }
+investigation = Skill { name : "Investigation", skillType : SingleValue, ability : Intuition }
 
-language :: String -> Skill
-language name = Skill { name : Language, type : FieldSpecific name, ability : Comprehension }
+language :: Skill
+language = Skill { name : "Language", skillType : FieldSpecific, ability : Comprehension }
 
-medicine :: String -> Skill
-medicine name = Skill { name : Medicine, type : FieldSpecific name, ability : Comprehension }
+medicine :: Skill
+medicine = Skill { name : "Medicine", skillType : FieldSpecific, ability : Comprehension }
 
-melee :: String -> Skill
-melee name = Skill { name : Melee, type : FieldSpecific name, ability : Strength }
+melee :: Skill
+melee = Skill { name : "Melee", skillType : FieldSpecific, ability : Strength }
 
 navigation :: Skill
-navigation = Skill { name : Navigation, type : Single, ability : Intuition }
+navigation = Skill { name : "Navigation", skillType : SingleValue, ability : Intuition }
 
 operations :: Skill
-operations = Skill { name : Operations, type : Single, ability : Comprehension }
+operations = Skill { name : "Operations", skillType : SingleValue, ability : Comprehension }
 
 perception :: Skill
-perception = Skill { name : Perception, type : Single, ability : Intuition }
+perception = Skill { name : "Perception", skillType : SingleValue, ability : Intuition }
 
 persuasion :: Skill
-persuasion = Skill { name : Persuasion, type : Single, ability : Intuition }
+persuasion = Skill { name : "Persuasion", skillType : SingleValue, ability : Intuition }
 
-pilot :: String -> Skill
-pilot name = Skill { name : Pilot, type : FieldSpecific name, ability : Agility }
+pilot :: Skill
+pilot = Skill { name : "Pilot", skillType : FieldSpecific, ability : Agility }
 
-profession :: String -> Skill
-profession name = Skill { name : Profession, type : FieldSpecific name, ability : Comprehension }
+profession :: Skill
+profession = Skill { name : "Profession", skillType : FieldSpecific, ability : Comprehension }
 
 programming :: Skill
-programming = Skill { name : Programming, type : Single, ability : Comprehension }
+programming = Skill { name : "Programming", skillType : SingleValue, ability : Comprehension }
 
 protocol :: Skill
-protocol = Skill { name : Protocol, type : Single, ability : Intuition }
+protocol = Skill { name : "Protocol", skillType : SingleValue, ability : Intuition }
 
-rangedWeapons :: String -> Skill
-rangedWeapons name = Skill { name : RangedWeapons, type : FieldSpecific name, ability : Agility }
+rangedWeapons :: Skill
+rangedWeapons = Skill { name : "RangedWeapons", skillType : FieldSpecific, ability : Agility }
 
 research :: Skill
-research = Skill { name : Research, type : Single, ability : Comprehension }
+research = Skill { name : "Research", skillType : SingleValue, ability : Comprehension }
 
 stealth :: Skill
-stealth = Skill { name : Stealth, type : Single, ability : Agility }
+stealth = Skill { name : "Stealth", skillType : SingleValue, ability : Agility }
 
 thrownWeapons :: Skill
-thrownWeapons = Skill { name : ThrownWeapons, type : Single, ability : Strength }
+thrownWeapons = Skill { name : "ThrownWeapons", skillType : SingleValue, ability : Strength }
+
+skills :: Array Skill
+skills =
+  [ academics
+  , art
+  , athletics
+  , deception
+  , demolitions
+  , disguise
+  , engineering
+  , gunnery
+  , interest
+  , investigation
+  , language
+  , medicine
+  , melee
+  , navigation
+  , operations
+  , perception
+  , persuasion
+  , pilot
+  , profession
+  , programming
+  , protocol
+  , rangedWeapons
+  , research
+  , stealth
+  , thrownWeapons
+  ]

@@ -47,6 +47,13 @@ baseCostOfAbility 4 = Just 3
 baseCostOfAbility 5 = Just 5
 baseCostOfAbility _ = Nothing
 
+abilityScore :: Ability -> BaseAbilities -> Int
+abilityScore Strength abilities = abilities.strength
+abilityScore Agility abilities = abilities.agility
+abilityScore Comprehension abilities = abilities.comprehension
+abilityScore Intuition abilities = abilities.intuition
+abilityScore _ abilities = 0
+
 
 
 

@@ -1,133 +1,152 @@
 module Background where
 
+import Data.Either
+import Data.Foldable
+import Data.Newtype
+import Data.Tuple
 import Prelude
 import Skills
-import Data.Tuple
-import Data.Map as Map
-import Data.Either
+
 import Data.Either.Nested (Either3, either3)
+import Data.Map as M
+import Data.Set as S
+import SkillMap as SM
 
 data FreeSkillBonus
-  = SpecificSkill SkillName Int
-  | OneOfTwoSkills SkillName SkillName Int
-  | OneOfThreeSkills SkillName SkillName SkillName Int
+  = SpecificSkill Skill Int
+  | OneOfTwoSkills Skill Skill Int
+  | OneOfThreeSkills Skill Skill Skill Int
 
 type Background = 
-  { startingSkills :: Map.Map Skill Int
+  { startingSkills :: SM.SkillMap
   , name :: String
   , freeSkillBonuses :: Array FreeSkillBonus
   }
 
+cp :: forall t a. Newtype t a => (a -> a) -> t -> t
+cp f n = wrap $ f $ unwrap n
+
 daystromInstitute :: Background
 daystromInstitute = 
- { startingSkills : skillMap
- , name : "Daystrom Institute"
- , freeSkillBonuses : []
- }
- where 
- skillMap =
-    Map.fromFoldable
-      [ Tuple (academics "AI")               2
-      , Tuple (academics "Computer Science") 4
-      , Tuple operations                     2
-      , Tuple programming                    3
-      , Tuple research                       3
-      ]
+  { startingSkills : skills
+  , name : "Daystrom Institute"
+  , freeSkillBonuses : []
+  }
+  where 
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.relatedSkills academics $ M.fromFoldable [Tuple "AI" 2, Tuple "Computer Science" 4]
+    , SM.singleSkill operations 2
+    , SM.singleSkill programming 3
+    , SM.singleSkill research 3
+    ]
+    -- S.fromFoldable
+    -- [ cp (\x -> x { rating = FieldSpecific $ M.fromFoldable [Tuple "AI" 2, Tuple "Computer Science" 4] }) academics
+    -- , cp (\x -> x { rating = SingleValue 2 }) operations
+    -- , cp (\x -> x { rating = SingleValue 3 }) programming
+    -- , cp (\x -> x { rating = SingleValue 3 }) research
+    -- ]
 
 formerMaquis ::  Background
 formerMaquis = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Former Maquis"
-  , freeSkillBonuses : [SpecificSkill Academics 2, SpecificSkill Profession 2]
+  , freeSkillBonuses : [SpecificSkill academics 2, SpecificSkill profession 2]
   }
   where 
-  skillMap = Map.fromFoldable
-      [ Tuple demolitions                    2
-      , Tuple (melee "Unarmed")              2
-      , Tuple (pilot "Spacecraft")           2
-      , Tuple (rangedWeapons "Phasers")      2
-      ]
+  skills = 
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill demolitions 2
+    , SM.relatedSkills melee $ M.fromFoldable [Tuple "Unarmed" 2]
+    , SM.relatedSkills pilot  $ M.fromFoldable [Tuple "Spacecraft" 2]
+    , SM.relatedSkills rangedWeapons  $ M.fromFoldable [Tuple "Phasers" 2]
+    ]
 
 klingonDefenseAcademy :: Background
 klingonDefenseAcademy = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Klingon Defense Academcy" 
-  , freeSkillBonuses : [OneOfTwoSkills Academics Engineering 2, OneOfTwoSkills Academics Engineering 2]
+  , freeSkillBonuses : [OneOfTwoSkills academics engineering 2, OneOfTwoSkills academics engineering 2]
   }
   where 
-  skillMap = Map.fromFoldable 
-      [ Tuple gunnery                        2
-      , Tuple (melee "Bladed")               2
-      , Tuple (melee "Unarmed")              2
-      , Tuple (profession "Soldier")         2
-      , Tuple (rangedWeapons "Disruptors")   2
-      ]
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill gunnery 2
+    , SM.relatedSkills melee $ M.fromFoldable [Tuple "Unarmed" 2, Tuple "Bladed" 4]
+    , SM.relatedSkills profession $ M.fromFoldable [Tuple "Soldier" 2]
+    , SM.relatedSkills rangedWeapons $ M.fromFoldable [Tuple "Disruptors" 2]
+    ]
 
 liberatedDrone :: Background
 liberatedDrone = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Liberated Drone"
-  , freeSkillBonuses : [SpecificSkill Academics 2, SpecificSkill Academics 2, SpecificSkill Academics 2]
+  , freeSkillBonuses : [SpecificSkill academics 2, SpecificSkill academics 2, SpecificSkill academics 2]
   }
   where 
-  skillMap = Map.fromFoldable
-    [ Tuple operations                     2
-    , Tuple programming                    3
-    , Tuple research                       3
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill operations 2
+    , SM.singleSkill programming 3
+    , SM.singleSkill research 3
     ]
 
 romulanWarCollege :: Background
 romulanWarCollege = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Romulan War College"
-  , freeSkillBonuses : [OneOfThreeSkills Academics Engineering Medicine 2, OneOfThreeSkills Academics Engineering Medicine 2, OneOfThreeSkills Academics Engineering Medicine 2]
+  , freeSkillBonuses : [OneOfThreeSkills academics engineering medicine 2, OneOfThreeSkills academics engineering medicine 2, OneOfThreeSkills academics engineering medicine 2]
   }
   where 
-  skillMap = Map.fromFoldable 
-      [ Tuple investigation                  2
-      , Tuple operations                     2
-      , Tuple (profession "Soldier")         2
-      , Tuple (rangedWeapons "Disruptors")   2
-      ]
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill investigation 2
+    , SM.singleSkill operations 2
+    , SM.relatedSkills profession $ M.fromFoldable [Tuple "Soldier" 2]
+    , SM.relatedSkills rangedWeapons $ M.fromFoldable [Tuple "Disruptors" 2]
+    ]
 
 section31 :: Background
 section31 = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Section 31"
-  , freeSkillBonuses : [OneOfTwoSkills Academics Engineering 2]
+  , freeSkillBonuses : [OneOfTwoSkills academics engineering 2]
   }
   where 
-  skillMap = Map.fromFoldable 
-      [ Tuple (academics "Cryptography")     2
-      , Tuple deception                      2
-      , Tuple investigation                  2
-      , Tuple operations                     2
-      , Tuple stealth                        2
-      ]
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.relatedSkills academics $ M.fromFoldable [Tuple "Cryptography" 2]
+    , SM.singleSkill deception 2
+    , SM.singleSkill investigation 2
+    , SM.singleSkill operations 2
+    , SM.singleSkill stealth 2
+    ]
 
 starfleetAcademy :: Background
 starfleetAcademy  = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Starfleet Academy"
-  , freeSkillBonuses : [OneOfThreeSkills Academics Engineering Medicine 2, OneOfThreeSkills Academics Engineering Medicine 2, OneOfThreeSkills Academics Engineering Medicine 2]
+  , freeSkillBonuses : [OneOfThreeSkills academics engineering medicine 2, OneOfThreeSkills academics engineering medicine 2, OneOfThreeSkills academics engineering medicine 2]
   }
   where 
-  skillMap = Map.fromFoldable 
-      [ Tuple (melee "Unarmed")              2
-      , Tuple (profession "Soldier")         2
-      , Tuple (protocol)                     2
-      , Tuple (rangedWeapons "Phasers")      2
-      ]
+  skills =
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.relatedSkills melee $ M.fromFoldable [Tuple "Unarmed" 2]
+    , SM.relatedSkills profession $ M.fromFoldable [Tuple "Soldier" 2]
+    , SM.singleSkill protocol 2
+    , SM.relatedSkills rangedWeapons $ M.fromFoldable [Tuple "Phasers" 2]
+    ]
 
 vulcanScienceAcademy :: Background
 vulcanScienceAcademy = 
-  { startingSkills : skillMap
+  { startingSkills : skills
   , name : "Vulcan Science Academy"
-  , freeSkillBonuses : [SpecificSkill Academics 5, SpecificSkill Academics 5]
+  , freeSkillBonuses : [SpecificSkill academics 5, SpecificSkill academics 5]
   }
   where
-  skillMap = Map.fromFoldable 
-    [ Tuple research                         4
+  skills = 
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill research 4
     ]
 
 trillScienceMinistry :: Background

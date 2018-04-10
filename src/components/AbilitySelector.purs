@@ -18,10 +18,10 @@ data AbilityAction
   | DecreaseAbilityScore Ability
 
 isIncreasable :: Ability -> CharacterBuilder -> Boolean
-isIncreasable ability cb = abilityScore ability cb < 5
+isIncreasable ability cb = abilityScore ability cb.abilities < 5
 
 isDecreasable :: Ability -> CharacterBuilder -> Boolean
-isDecreasable ability cb = abilityScore ability cb > 2
+isDecreasable ability cb = abilityScore ability cb.abilities > 2
 
 performAction :: T.PerformAction _ CharacterBuilder _ AbilityAction
 performAction (IncreaseAbilityScore Strength) _ _ = void do

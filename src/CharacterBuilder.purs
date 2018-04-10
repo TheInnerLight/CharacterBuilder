@@ -3,21 +3,31 @@ module CharacterBuilder where
 import Abilities
 import Data.List
 import Data.Maybe
+import Data.Tuple
 import Prelude
 import Races
 import Skills
-
+import SkillMap as SM
 import Background (Background)
-import Data.Map as Map
+import Data.Array as A
+import Data.Map as M
+import Data.Set as S
 
 type CharacterBuilder = 
   { abilityPoints :: Int
   , skillPoints :: Int
   , abilities :: BaseAbilities
-  , skills :: Map.Map Skill Int
+  , skills :: SM.SkillMap
   , background :: Maybe Background
   , race :: Maybe Race
   }
+
+derivedSkills :: CharacterBuilder -> SM.SkillMap
+derivedSkills cb =
+  SM.merge cb.skills $ backgroundSkillSet cb.background
+  where 
+  backgroundSkillSet (Nothing) = SM.empty
+  backgroundSkillSet (Just background) = background.startingSkills
 
 applyRacialStatBonus :: Race -> DerivedAbilities -> DerivedAbilities
 applyRacialStatBonus race pa =
@@ -33,23 +43,16 @@ applyRacialStatBonus race pa =
 
 calculateDerivedAbilities :: CharacterBuilder -> DerivedAbilities
 calculateDerivedAbilities cb = 
-    foldl (\acc race -> applyRacialStatBonus race acc) baseDerivedAbilities cb.race
-    where
-    baseDerivedAbilities = 
-        { strength : cb.abilities.strength
-        , agility : cb.abilities.agility
-        , intuition : cb.abilities.intuition
-        , comprehension : cb.abilities.comprehension
-        , health : (cb.abilities.strength + cb.abilities.agility)/2
-        , resolve : (cb.abilities.intuition + cb.abilities.comprehension)/2
-        }
-
-abilityScore :: Ability -> CharacterBuilder -> Int
-abilityScore Strength cb = cb.abilities.strength
-abilityScore Agility cb = cb.abilities.agility
-abilityScore Comprehension cb = cb.abilities.comprehension
-abilityScore Intuition cb = cb.abilities.intuition
-abilityScore _ cb = 0
+  foldl (\acc race -> applyRacialStatBonus race acc) baseDerivedAbilities cb.race
+  where
+  baseDerivedAbilities = 
+    { strength : cb.abilities.strength
+    , agility : cb.abilities.agility
+    , intuition : cb.abilities.intuition
+    , comprehension : cb.abilities.comprehension
+    , health : (cb.abilities.strength + cb.abilities.agility)/2
+    , resolve : (cb.abilities.intuition + cb.abilities.comprehension)/2
+    }
 
 remainingAbilityPoints :: CharacterBuilder -> Maybe Int
 remainingAbilityPoints cb = do
