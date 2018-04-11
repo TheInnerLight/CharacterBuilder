@@ -37,7 +37,7 @@ render :: T.Render CharacterBuilder _ _
 render dispatch _ state _ =
   [ R.p [ RP.className "Abilities"]
     [ R.p' [ R.text "Remaining Ability Points: ", R.text remainingAbilityPointText ]
-      , R.p [ RP.className "Strength" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Strength: "
           , R.text   $ show derivedAbilities.strength
@@ -48,7 +48,7 @@ render dispatch _ state _ =
                       , RP.disabled $ not $ isDecreasable Strength state ]
                     [ R.text "-" ]
           ]
-      , R.p [ RP.className "Agility" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Agility: "
           , R.text   $ show derivedAbilities.agility
@@ -59,7 +59,7 @@ render dispatch _ state _ =
                      , RP.disabled $ not $ isDecreasable Agility state ]
                     [ R.text "-" ]
           ]
-      , R.p [ RP.className "Comprehension" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Comprehension: "
           , R.text   $ show derivedAbilities.comprehension
@@ -70,7 +70,7 @@ render dispatch _ state _ =
                      , RP.disabled $ not $ isDecreasable Comprehension state ]
                     [ R.text "-" ]
           ]
-      , R.p [ RP.className "Intuition" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Intuition: "
           , R.text   $ show derivedAbilities.intuition
@@ -81,12 +81,12 @@ render dispatch _ state _ =
                     , RP.disabled $ not $ isDecreasable Intuition state ]
                     [ R.text "-" ]
           ]
-      , R.p [ RP.className "Health" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Health: "
           , R.text   $ show derivedAbilities.health
           ]
-      , R.p [ RP.className "Resolve" ] 
+      , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Resolve: "
           , R.text   $ show derivedAbilities.resolve
