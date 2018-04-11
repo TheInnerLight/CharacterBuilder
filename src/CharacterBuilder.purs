@@ -96,13 +96,14 @@ costOfSkill skill value modifiedBoundaries =
 
 remainingSkillPoints :: CharacterBuilder -> Maybe Int
 remainingSkillPoints cb = do
-  cost <- foldl (folder) (Just 0) skillList
-  Just $ cb.skillPoints - cost
+  cost <- totalCost $ derivedSkills cb
+  costOfBackgroundSkills <- totalCost $ fromMaybe M.empty $ map (\bg -> bg.startingSkills) cb.background
+  Just $ cb.skillPoints + costOfBackgroundSkills - cost
   where
+  totalCost skills = foldl (folder) (Just 0) $ skillList skills
   folder acc (Tuple skill value) = do 
     accuCost <- acc
     cost <- costOfSkill skill value skillBoundaries
     Just $ accuCost + cost
-  --folder acc (Tuple skill value) = costOfSkill skill value skillBoundaries
   skillBoundaries = fromMaybe M.empty $ map (\r -> r.skillBoundaries) cb.race 
-  skillList = foldl (\acc (Tuple k v) -> append (map (Tuple k) (M.values v)) acc) Nil $ mapToArray cb.skills
+  skillList skills = foldl (\acc (Tuple k v) -> append (map (Tuple k) (M.values v)) acc) Nil $ mapToArray skills
