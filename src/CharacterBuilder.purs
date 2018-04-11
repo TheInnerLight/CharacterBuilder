@@ -84,12 +84,14 @@ remainingAbilityPoints cb = do
 
 costOfSkill :: Skill -> Int -> M.Map Skill (Tuple3 Int Int Int) -> Maybe Int
 costOfSkill skill value modifiedBoundaries =
-  case value of
-    v | v < get1 boundaries -> Just v
-    v | v < get2 boundaries -> Just (get1 boundaries + (v - get1 boundaries) * 2 )
-    v | v < get3 boundaries -> Just (get1 boundaries + (get2 boundaries - get1 boundaries) * 2 + (v - get2 boundaries) * 3  )
-    v -> Just (get1 boundaries + (get2 boundaries - get1 boundaries) * 2 + (get3 boundaries - get2 boundaries) * 3 + (v - get3 boundaries) * 4 )
+  uncurry3 (costWithBounds value) boundaries
   where
+  costWithBounds value bound1 bound2 bound3 = 
+    case value of
+      v | v < bound1 -> Just v
+      v | v < bound2 -> Just (bound1 + (v - bound1) * 2 )
+      v | v < bound3 -> Just (bound1 + (bound2 - bound1) * 2 + (v - bound2) * 3  )
+      v -> Just (bound1 + (bound2 - bound1) * 2 + (bound3 - bound2) * 3 + (v - bound3) * 4 )
   boundaries = fromMaybe (tuple3 3 6 9) (M.lookup skill modifiedBoundaries)
 
 remainingSkillPoints :: CharacterBuilder -> Maybe Int
