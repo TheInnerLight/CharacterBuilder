@@ -32,6 +32,11 @@ update skill maybeString f skillMap = M.update (\m -> Just $ updateInternal m) s
   updater f (Just x) = Just $ f x
   updater f (Nothing) = Just $ f 0
 
+removeSkill :: Skill -> Maybe String -> SkillMap -> SkillMap 
+removeSkill skill maybeString skillMap = M.update (\m -> Just $ updateInternal m) skill skillMap
+  where
+  updateInternal subSkillMap = M.alter (const Nothing) maybeString subSkillMap
+
 getSkillValue :: Skill -> Maybe String -> SkillMap -> Maybe Int
 getSkillValue skill maybeString skillMap = do 
   subSkillMap <- M.lookup skill skillMap

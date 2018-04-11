@@ -24,6 +24,7 @@ data SkillSelectorAction
   = IncreaseSkill Skill (Maybe String)
   | DecreaseSkill Skill (Maybe String)
   | CreateSkill Skill String
+  | DeleteSkill Skill String
 
 performAction :: T.PerformAction _ CharacterBuilder _ SkillSelectorAction
 performAction (IncreaseSkill skill maybeSubSkill) _ _ = void do
@@ -32,6 +33,8 @@ performAction (DecreaseSkill skill maybeSubSkill) _ _ = void do
   T.modifyState $ transformSkill skill maybeSubSkill (\x -> x - 1)
 performAction (CreateSkill skill subSkill) _ _ = void do
   T.modifyState (\state -> state { skills = SM.update skill (Just subSkill) (const 0) state.skills } )
+performAction (DeleteSkill skill subSkill) _ _ = void do
+  T.modifyState (\state -> state { skills = removeSkill skill (Just subSkill) state.skills } )
 
 isIncreasable :: Skill -> Maybe String -> CharacterBuilder -> Boolean
 isIncreasable skill maybeSubSkill cb = 
@@ -47,6 +50,12 @@ isDecreasable skill maybeSubSkill cb =
   where
   maybeValue = SM.getSkillValue skill maybeSubSkill cb.skills -- skill minimums should be applied to base skills
 
+isDeletable :: Skill -> Maybe String -> CharacterBuilder -> Boolean
+isDeletable skill maybeSubskill cb = 
+  case cb.background of
+    Just background -> isNothing $ SM.getSkillValue skill maybeSubskill background.startingSkills
+    Nothing         -> true
+
 elementFromSkill :: CharacterBuilder -> (SkillSelectorAction -> T.EventHandler) -> Tuple Skill (M.Map (Maybe String) Int) -> R.ReactElement
 elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  = 
   reactElem subskills
@@ -61,7 +70,9 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
           , R.button [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Just subskill) 
                      , RP.disabled $ not $ isDecreasable wrappedSkill (Just subskill) cb ]
                      [ R.text "-" ]
-          , R.button'[ R.text "✖" ]
+          , R.button [ RP.onClick \_ -> dispatch (DeleteSkill wrappedSkill subskill) 
+                     , RP.hidden $ not $ isDeletable wrappedSkill (Just subskill) cb ]
+                     [ R.text "✖" ]
           ]
     ]
   singleReactElement (Tuple Nothing v) = 
