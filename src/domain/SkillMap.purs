@@ -1,10 +1,13 @@
 module SkillMap where
+import Data.Foldable
 import Data.Maybe
+import Data.Tuple.Nested
 import Data.Unfoldable
 import Prelude
 import Skills
 
 import Data.Array as A
+import Data.List as L
 import Data.Map as M
 import Data.Tuple (Tuple(..))
 
@@ -42,4 +45,9 @@ getSkillValue skill maybeString skillMap = do
   subSkillMap <- M.lookup skill skillMap
   value <- M.lookup maybeString subSkillMap
   Just value
+
+getSkillList :: SkillMap -> L.List (Tuple3 Skill (Maybe String) Int)
+getSkillList skillMap = foldl folder L.Nil $ mapToArray skillMap
+  where
+  folder acc (Tuple k v) = append (map (\(Tuple s v) -> tuple3 k s v) (L.fromFoldable $ mapToArray v)) acc
 
