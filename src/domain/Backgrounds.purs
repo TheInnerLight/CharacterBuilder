@@ -40,12 +40,6 @@ daystromInstitute =
     , SM.singleSkill programming 3
     , SM.singleSkill research 3
     ]
-    -- S.fromFoldable
-    -- [ cp (\x -> x { rating = FieldSpecific $ M.fromFoldable [Tuple "AI" 2, Tuple "Computer Science" 4] }) academics
-    -- , cp (\x -> x { rating = SingleValue 2 }) operations
-    -- , cp (\x -> x { rating = SingleValue 3 }) programming
-    -- , cp (\x -> x { rating = SingleValue 3 }) research
-    -- ]
 
 formerMaquis ::  Background
 formerMaquis = 

@@ -40,7 +40,13 @@ raceSelector dispatch _ state _ =
             ]
             , map (optionElementFromRace dispatch) races]
         )
-        
+      , R.p' 
+          case state.race of
+            Just race -> A.concat 
+              [ map (\x -> R.p' [R.text $ show x]) race.advantages
+              , map (\x -> R.p' [R.text $ show x]) race.disadvantages
+              ]
+            Nothing -> []
       ]
   ]
 

@@ -15,8 +15,8 @@ data Advantage
   | Unreadable
 
 instance showAdvantage :: Show Advantage where
-  show (AbilityBonus ability bonus) = show bonus <> " bonus to " <> show ability <> " score."
-  show (AnyAbilityBonus amount)     = show amount <> " bonus to any ability score(s)."
+  show (AbilityBonus ability bonus) = "+" <> show bonus <> " bonus to " <> show ability <> " score."
+  show (AnyAbilityBonus amount)     = "+" <> show amount <> " bonus to any ability score(s)."
   show Telepathy                    = "Telepathy."
   show Unreadable                   = "Immune to telepathy."
 
@@ -25,8 +25,8 @@ data Disadvantage
   | IllegalGeneticStatus
 
 instance showDisadvantage :: Show Disadvantage where
-  show NoAutomaticLanguage  = "Does not start with any skills a language automatically."
-  show IllegalGeneticStatus = "There may be negative consequences if your genetic status is discovered."
+  show NoAutomaticLanguage  = "No starting language skills."
+  show IllegalGeneticStatus = "Illegal Genetic Status."
 
 type Race =
   { skillBoundaries :: M.Map Skill (Tuple3 Int Int Int)

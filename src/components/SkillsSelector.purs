@@ -92,12 +92,12 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
     case skill.skillType of
       FieldSpecific -> 
         A.concat [ bind (mapToArray subskills) singleReactElement
-                 , [ R.p'
-                      [  R.text $ skill.name <> " ("
-                      ,  R.input [ RP.onKeyUp \e -> handleKeyPress (unsafeCoerce e).keyCode (unsafeCoerce e).target.value]
-                                 []
-                      , R.text ")"
-                      ]
+                 , [ R.p  [ RP.hidden $ not $ any (\x -> x > 0) (remainingSkillPoints cb) ]
+                          [  R.text $ skill.name <> " ("
+                          ,  R.input [ RP.onKeyUp \e -> handleKeyPress (unsafeCoerce e).keyCode (unsafeCoerce e).target.value]
+                                    []
+                          , R.text ")"
+                          ]
                     ]
                  ]
       SingleValue -> bind (mapToArray subskills) singleReactElement
