@@ -27,15 +27,22 @@ optionElementFromBackground dispatch background =
 backgroundSelector :: T.Render CharacterBuilder _ _
 backgroundSelector dispatch _ state _ =
   [ R.p [ RP.className "Background"]
-      [ R.text "Background: "
-        , R.select [RP.className "BackgroundSelector"]
-        (A.concat [
-            [ R.option [ RP.onClick \_ -> dispatch (SelectBackground $ Nothing)]
-                     [ R.text ("----")]
-            ]
-            , map (optionElementFromBackground dispatch) backgrounds]
-        )
-      ]
+    [ R.text "Background: "
+      , R.select [RP.className "BackgroundSelector"]
+      (A.concat [
+          [ R.option [ RP.onClick \_ -> dispatch (SelectBackground $ Nothing)]
+                    [ R.text ("----")]
+          ]
+          , map (optionElementFromBackground dispatch) backgrounds]
+      )
+      , R.p' 
+          case state.background of
+            Just background -> A.concat 
+              [ map (\x -> R.p' [R.text $ show x]) background.freeSkillBonuses
+              ]
+            Nothing -> []
+
+    ]
   ]
 
 backgroundSelectorSpec :: T.Spec _ CharacterBuilder _ BackgroundSelectorAction

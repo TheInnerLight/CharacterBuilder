@@ -24,6 +24,11 @@ data FreeSkillBonus
   | OneOfTwoSkills Skill Skill Int
   | OneOfThreeSkills Skill Skill Skill Int
 
+instance freeSkillBonusShow :: Show FreeSkillBonus where
+  show (SpecificSkill (Skill skill) value) = show value <> " skill points in " <> skill.name
+  show (OneOfTwoSkills (Skill skill1) (Skill skill2) value) = show value <> " skill points in " <> skill1.name <> " or " <> skill2.name
+  show (OneOfThreeSkills (Skill skill1) (Skill skill2) (Skill skill3) value) = show value <> " skill points in " <> skill1.name <> " or " <> skill2.name <> " or " <> skill3.name
+
 derive instance newtypeSkill :: Newtype Skill _
 derive instance eqSkill :: Eq Skill
 derive instance ordSkill :: Ord Skill

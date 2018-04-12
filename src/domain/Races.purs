@@ -4,7 +4,6 @@ import Data.Tuple
 import Data.Tuple.Nested
 import Prelude
 import Skills
-
 import Abilities (Ability(..))
 import Data.Map as M
 

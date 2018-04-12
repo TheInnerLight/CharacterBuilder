@@ -45,6 +45,8 @@ raceSelector dispatch _ state _ =
             Just race -> A.concat 
               [ map (\x -> R.p' [R.text $ show x]) race.advantages
               , map (\x -> R.p' [R.text $ show x]) race.disadvantages
+              , [ R.p' [R.text $ "Fate: " <> (show race.fate)]
+                ]
               ]
             Nothing -> []
       ]
