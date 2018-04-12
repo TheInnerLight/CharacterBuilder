@@ -38,10 +38,9 @@ performAction (DeleteSkill skill subSkill) _ _ = void do
 
 isIncreasable :: Skill -> Maybe String -> CharacterBuilder -> Boolean
 isIncreasable skill maybeSubSkill cb = 
-  (fromMaybe true $ map (\x -> x < 10) maybeValue) && increasableAfterChange
+  (fromMaybe true $ map (\x -> x < 10) maybeValue) && (skillPointsAfterChange >= 0)
   where
   maybeValue = SM.getSkillValue skill maybeSubSkill (derivedSkills cb) -- skill maximums should be applied to derived skills
-  increasableAfterChange = fromMaybe false $ map (\x -> x >= 0) skillPointsAfterChange
   skillPointsAfterChange = remainingSkillPoints $ transformSkill skill maybeSubSkill (\x -> x + 1) cb
 
 isDecreasable :: Skill -> Maybe String -> CharacterBuilder -> Boolean
@@ -92,7 +91,7 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
     case skill.skillType of
       FieldSpecific -> 
         A.concat [ bind (mapToArray subskills) singleReactElement
-                 , [ R.p  [ RP.hidden $ not $ any (\x -> x > 0) (remainingSkillPoints cb) ]
+                 , [ R.p  [ RP.hidden $ not $ remainingSkillPoints cb > 0 ]
                           [  R.text $ skill.name <> " ("
                           ,  R.input [ RP.onKeyUp \e -> handleKeyPress (unsafeCoerce e).keyCode (unsafeCoerce e).target.value]
                                     []
@@ -107,16 +106,13 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
 
 skillSelector :: T.Render CharacterBuilder _ _
 skillSelector dispatch _ state _ =
-  [ R.p' [R.text $ "Remaining Skill Points: " <> remainingSkillPointsText ] 
+  [ R.p' [R.text $ "Remaining Skill Points: " <> (show $ remainingSkillPoints state) ] 
   ,  R.p [ RP.className "Skills"]
      (map (elementFromSkill state dispatch) skillArray)
   ]
   where 
   skillArray = A.sortBy (alphabeticalSkills) $ SM.mapToArray $ derivedSkills state
   alphabeticalSkills (Tuple (Skill s) _) (Tuple (Skill s') _) = Str.localeCompare s.name s'.name
-  remainingSkillPointsText = case remainingSkillPoints state of
-    Just x -> show x
-    Nothing -> "----"
 
 skillSelectorSpec :: T.Spec _ CharacterBuilder _ SkillSelectorAction
 skillSelectorSpec = T.simpleSpec performAction skillSelector

@@ -1,8 +1,10 @@
 module Skills where
 
 import Abilities
+import Data.Maybe
 import Data.Newtype
-import Data.Map
+import Data.Map as M
+import Data.Tuple.Nested
 import Prelude
 
 data SkillType 
@@ -15,11 +17,30 @@ newtype Skill = Skill
   , ability :: Ability
   }
 
+type SkillBoundaries = M.Map Skill (Tuple3 Int Int Int)
+
+data FreeSkillBonus
+  = SpecificSkill Skill Int
+  | OneOfTwoSkills Skill Skill Int
+  | OneOfThreeSkills Skill Skill Skill Int
+
 derive instance newtypeSkill :: Newtype Skill _
 derive instance eqSkill :: Eq Skill
 derive instance ordSkill :: Ord Skill
 derive instance eqSkillType :: Eq SkillType
 derive instance ordSkillType :: Ord SkillType
+
+costOfBuyingSkill :: SkillBoundaries -> Skill -> Int -> Int
+costOfBuyingSkill boundaries skill value =
+  let boundary = fromMaybe (tuple3 3 6 9) $ M.lookup skill $ boundaries in 
+  uncurry3 (costWithBounds value) boundary
+  where
+  costWithBounds value bound1 bound2 bound3 = 
+    case value of
+      v | v < bound1 -> v
+      v | v < bound2 -> bound1 + (v - bound1) * 2
+      v | v < bound3 -> bound1 + (bound2 - bound1) * 2 + (v - bound2) * 3
+      v              -> bound1 + (bound2 - bound1) * 2 + (bound3 - bound2) * 3 + (v - bound3) * 4
 
 academics :: Skill
 academics = Skill { name : "Academics", skillType : FieldSpecific, ability : Comprehension }

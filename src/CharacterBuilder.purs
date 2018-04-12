@@ -1,6 +1,9 @@
 module CharacterBuilder where
   
 import Abilities
+import Background
+import Control.Alt
+import Data.Array as A
 import Data.List
 import Data.Maybe
 import Data.Tuple
@@ -9,9 +12,8 @@ import Prelude
 import Races
 import Skills
 
-import Background (Background)
 import Data.Map as M
-import SkillMap (mapToArray)
+import SkillMap (costOfSkills, mapToArray, valueOfFreeSkills)
 import SkillMap as SM
 
 type CharacterBuilder = 
@@ -78,29 +80,14 @@ remainingAbilityPoints cb = do
   agCost <- baseCostOfAbility cb.abilities.agility
   Just (cb.abilityPoints - strCost - compCost - intCost - agCost)
 
-costOfSkill :: Skill -> Int -> M.Map Skill (Tuple3 Int Int Int) -> Maybe Int
-costOfSkill skill value modifiedBoundaries =
-  uncurry3 (costWithBounds value) boundaries
+remainingSkillPoints :: CharacterBuilder -> Int
+remainingSkillPoints cb =
+  let variableFreeSkillCost = valueOfFreeSkills boundaries freeSkills cb.skills in 
+  let backgroundSkillCost = costOfSkills boundaries $ backgroundSkills in
+  let combinedCost = costOfSkills boundaries $ combinedSkills in
+  cb.skillPoints + variableFreeSkillCost + backgroundSkillCost - combinedCost
   where
-  costWithBounds value bound1 bound2 bound3 = 
-    case value of
-      v | v < bound1 -> Just v
-      v | v < bound2 -> Just $ bound1 + (v - bound1) * 2
-      v | v < bound3 -> Just $ bound1 + (bound2 - bound1) * 2 + (v - bound2) * 3
-      v              -> Just $ bound1 + (bound2 - bound1) * 2 + (bound3 - bound2) * 3 + (v - bound3) * 4
-  boundaries = fromMaybe (tuple3 3 6 9) (M.lookup skill modifiedBoundaries)
-
-remainingSkillPoints :: CharacterBuilder -> Maybe Int
-remainingSkillPoints cb = do
-  cost <- totalCost $ derivedSkills cb
-  costOfBackgroundSkills <- totalCost $ fromMaybe M.empty $ map (\bg -> bg.startingSkills) cb.background
-  Just $ cb.skillPoints + costOfBackgroundSkills - cost
-  where
-  skillBoundaries = fromMaybe M.empty $ map (\r -> r.skillBoundaries) cb.race 
-  totalCost skills = 
-    let folder acc (Tuple skill value) = do 
-         accuCost <- acc
-         cost <- costOfSkill skill value skillBoundaries
-         Just $ accuCost + cost in
-    foldl (folder) (Just 0) $ map (uncurry3 \s _ v -> Tuple s v) $ SM.getSkillList skills
-
+  combinedSkills = derivedSkills cb
+  backgroundSkills = fromMaybe M.empty $ map (\bg -> bg.startingSkills) cb.background
+  freeSkills = fromMaybe [] $ map (\bg -> bg.freeSkillBonuses) cb.background
+  boundaries = fromMaybe M.empty $ map (\r -> r.skillBoundaries) cb.race

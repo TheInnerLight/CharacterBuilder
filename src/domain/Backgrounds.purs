@@ -10,12 +10,8 @@ import Skills
 import Data.Either.Nested (Either3, either3)
 import Data.Map as M
 import Data.Set as S
+import Skills
 import SkillMap as SM
-
-data FreeSkillBonus
-  = SpecificSkill Skill Int
-  | OneOfTwoSkills Skill Skill Int
-  | OneOfThreeSkills Skill Skill Skill Int
 
 type Background = 
   { startingSkills :: SM.SkillMap
