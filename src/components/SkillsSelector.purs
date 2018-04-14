@@ -63,27 +63,31 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
     [ R.p [ RP.className "Skill"]
           [ R.text   $ skill.name <> " (" <> subskill <> ")" <> ": "
           , R.text   $ show v
-          , R.button [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Just subskill)
-                     , RP.disabled $ not $ isIncreasable wrappedSkill (Just subskill) cb ]
-                     [ R.text "+" ]
-          , R.button [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Just subskill) 
-                     , RP.disabled $ not $ isDecreasable wrappedSkill (Just subskill) cb ]
-                     [ R.text "-" ]
-          , R.button [ RP.onClick \_ -> dispatch (DeleteSkill wrappedSkill subskill) 
-                     , RP.hidden $ not $ isDeletable wrappedSkill (Just subskill) cb ]
-                     [ R.text "✖" ]
+          , R.div [ RP.className "plus-minus-button"]
+                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Just subskill)
+                              , RP.disabled $ not $ isIncreasable wrappedSkill (Just subskill) cb ]
+                              [ R.text "+" ]
+                  , R.button  [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Just subskill) 
+                              , RP.disabled $ not $ isDecreasable wrappedSkill (Just subskill) cb ]
+                              [ R.text "-" ]
+                  , R.button  [ RP.onClick \_ -> dispatch (DeleteSkill wrappedSkill subskill) 
+                              , RP.hidden $ not $ isDeletable wrappedSkill (Just subskill) cb ]
+                              [ R.text "✖" ]
+                  ]
           ]
     ]
   singleReactElement (Tuple Nothing v) = 
     [ R.p [ RP.className "Skill"]
           [ R.text   $ skill.name <> ": "
           , R.text   $ show v
-          , R.button [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill Nothing)
-                     , RP.disabled $ not $ isIncreasable wrappedSkill Nothing cb ]
-                     [ R.text "+" ]
-          , R.button [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill Nothing) 
-                     , RP.disabled $ not $ isDecreasable wrappedSkill Nothing cb ]
-                     [ R.text "-" ]
+          , R.div [ RP.className "plus-minus-button"]
+                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Nothing)
+                              , RP.disabled $ not $ isIncreasable wrappedSkill Nothing cb ]
+                              [ R.text "+" ]
+                  , R.button  [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Nothing) 
+                              , RP.disabled $ not $ isDecreasable wrappedSkill Nothing cb ]
+                              [ R.text "-" ]
+                  ]
           ]
     ]
   wrappedSkill = Skill skill  
@@ -106,12 +110,14 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
 
 skillSelector :: T.Render CharacterBuilder _ _
 skillSelector dispatch _ state _ =
-  [ R.p' [R.text $ "Remaining Skill Points: " <> (show $ remainingSkillPoints state) ] 
-  ,  R.p [ RP.className "Skills"]
-     (map (elementFromSkill state dispatch) skillArray)
+  [ R.div [ RP.className "character-builder-component"]
+          [ R.p' [ R.text $ "Remaining Skill Points: " <> (show $ remainingSkillPoints state) ]  
+          , R.p'
+             (map (elementFromSkill state dispatch) skillArray)
+          ]
   ]
   where 
-  skillArray = A.sortBy (alphabeticalSkills) $ SM.mapToArray $ derivedSkills state
+  skillArray = A.sortBy alphabeticalSkills $ SM.mapToArray $ derivedSkills state
   alphabeticalSkills (Tuple (Skill s) _) (Tuple (Skill s') _) = Str.localeCompare s.name s'.name
 
 skillSelectorSpec :: T.Spec _ CharacterBuilder _ SkillSelectorAction

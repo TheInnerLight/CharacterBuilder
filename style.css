@@ -1,0 +1,50 @@
+html, body {
+    height: 100%;
+}
+
+html {
+    display: table;
+    margin: auto;
+}
+
+body {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.character-builder-component {
+    width : 30pc;
+    min-width: 320px;
+    border-width: 1px;
+    border-color: grey;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 5px;
+}
+
+.plus-minus-button {
+    float : right;
+}
+
+.background-selector {
+    float : right;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.race-selector {
+    float : right;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    border: 1px solid grey;
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
