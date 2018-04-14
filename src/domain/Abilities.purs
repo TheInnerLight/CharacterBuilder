@@ -53,9 +53,3 @@ abilityScore Agility abilities = abilities.agility
 abilityScore Comprehension abilities = abilities.comprehension
 abilityScore Intuition abilities = abilities.intuition
 abilityScore _ abilities = 0
-
-
-
-
-
-

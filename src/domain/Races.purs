@@ -10,13 +10,15 @@ import Data.Map as M
 data Advantage 
   = AbilityBonus Ability Int
   | AnyAbilityBonus Int
-  | Telepathy
+  | Empathic
+  | Telepathic
   | Unreadable
 
 instance showAdvantage :: Show Advantage where
   show (AbilityBonus ability bonus) = "+" <> show bonus <> " bonus to " <> show ability <> " score."
   show (AnyAbilityBonus amount)     = "+" <> show amount <> " bonus to any ability score(s)."
-  show Telepathy                    = "Telepathy."
+  show Empathic                     = "Empathic."
+  show Telepathic                   = "Telepathic."
   show Unreadable                   = "Immune to telepathy."
 
 data Disadvantage 
@@ -28,15 +30,15 @@ instance showDisadvantage :: Show Disadvantage where
   show IllegalGeneticStatus = "Illegal Genetic Status."
 
 type Race =
-  { skillBoundaries :: M.Map Skill (Tuple3 Int Int Int)
+  { skillBoundaries :: M.Map Skill SkillBoundary
   , fate :: Int
   , advantages :: Array Advantage
   , disadvantages :: Array Disadvantage
   , name :: String
   }
 
-increasedBy :: Int -> Tuple3 Int Int Int 
-increasedBy x = tuple3 (3 + x) (6 + x) (9 + x)
+increasedBy :: Int -> SkillBoundary
+increasedBy x = { cost2 : defaultSkillBoundary.cost2 + x, cost3 : defaultSkillBoundary.cost3 + x, cost4: defaultSkillBoundary.cost4 + x }
 
 andorian :: Race 
 andorian = 
@@ -60,6 +62,18 @@ android =
   , name : "Android"
   }
 
+ariolo :: Race 
+ariolo = 
+  { skillBoundaries :
+    M.fromFoldable
+    [ Tuple art           (increasedBy 2)
+    , Tuple perception    (increasedBy 1)]
+  , fate : 3
+  , advantages : []
+  , disadvantages : []
+  , name : "Ariolo"
+  }  
+
 bajoran :: Race 
 bajoran =
   { skillBoundaries : 
@@ -77,7 +91,7 @@ betazoid :: Race
 betazoid =
   { skillBoundaries : M.fromFoldable []
   , fate : 2
-  , advantages : [Telepathy]
+  , advantages : [Telepathic]
   , disadvantages : []
   , name : "Betazoid"
   }
@@ -114,7 +128,7 @@ cairn =
     M.fromFoldable
     [ Tuple perception    (increasedBy 1)]
   , fate : 2
-  , advantages : [Telepathy]
+  , advantages : [Telepathic]
   , disadvantages : [NoAutomaticLanguage]
   , name : "Cairn"
   }
@@ -132,13 +146,27 @@ cardassian =
   , name : "Cardassian"
   }
 
+coridan :: Race
+coridan =
+  { skillBoundaries : 
+    M.fromFoldable
+    [ Tuple engineering   (increasedBy 1)
+    , Tuple operations    (increasedBy 1)
+    , Tuple programming    (increasedBy 1)
+    ]
+  , fate : 3
+  , advantages : []
+  , disadvantages : []
+  , name : "Coridan"
+  }
+
 deltan :: Race 
 deltan =
   { skillBoundaries : 
     M.fromFoldable
     [ Tuple academics     (increasedBy 1)
     , Tuple art           (increasedBy 1)]
-  , fate : 1
+  , fate : 2
   , advantages : [AbilityBonus Comprehension 1, AbilityBonus Intuition 1]
   , disadvantages : []
   , name : "Deltan"
@@ -181,6 +209,18 @@ grazerite =
   , name : "Grazerite"
   }
 
+haliian :: Race
+haliian =
+  { skillBoundaries : 
+    M.fromFoldable
+    [ Tuple operations    (increasedBy 1)
+    , Tuple perception    (increasedBy 1)]
+  , fate : 3
+  , advantages : [Empathic]
+  , disadvantages : []
+  , name : "Haliian"
+  }
+
 human :: Race
 human =
   { skillBoundaries : 
@@ -196,8 +236,12 @@ human =
 
 geneticallyEngineeredHuman :: Race
 geneticallyEngineeredHuman =
-  { skillBoundaries : M.fromFoldable []
-  , fate : 2
+  { skillBoundaries :
+    M.fromFoldable
+    [ Tuple profession    (increasedBy 1)
+    , Tuple protocol      (increasedBy 1)
+    , Tuple research      (increasedBy 1)]
+  , fate : 1
   , advantages : [AnyAbilityBonus 2]
   , disadvantages : [IllegalGeneticStatus]
   , name : "Genetically Engineered Human"
@@ -293,15 +337,18 @@ races :: Array Race
 races = 
   [ andorian
   , android
+  , ariolo
   , bajoran
   , betazoid
   , bolian
   , cairn
   , cardassian
+  , coridan
   , deltan
   , efrosian
   , ferengi
   , grazerite
+  , haliian
   , human
   , geneticallyEngineeredHuman
   , klingon

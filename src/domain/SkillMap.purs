@@ -1,15 +1,15 @@
 module SkillMap where
-import Data.Foldable
-import Data.Maybe
-import Data.Tuple.Nested
+
 import Prelude
-import Skills
 
 import Control.Alt ((<|>))
-import Data.Array as A
+import Data.Foldable (foldl)
 import Data.List as L
 import Data.Map as M
-import Data.Tuple (Tuple(..), snd, uncurry)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.Tuple (Tuple(..), snd)
+import Data.Tuple.Nested (Tuple3, tuple3, uncurry3)
+import Skills (FreeSkillBonus(..), Skill, SkillBoundaries, costOfBuyingSkill)
 
 type SkillMap = M.Map Skill (M.Map (Maybe String) Int)
 
@@ -56,18 +56,22 @@ costOfSkills boundaries skills = foldl (\acc -> uncurry3 (\skill _ value -> acc 
 
 valueOfFreeSkills :: SkillBoundaries -> Array FreeSkillBonus -> SkillMap -> Int
 valueOfFreeSkills boundaries freeSkills skills =
-  snd $ foldl applyVariableFreeSkill (Tuple (costsByOuterSkills skills) 0) freeSkills
+  snd $ foldl applyVariableFreeSkill (Tuple skills 0) freeSkills
   where 
+  skillOfAnySubtypeWithMinimum :: Int -> Skill -> SkillMap -> Maybe {key :: Maybe String, value :: Int}
+  skillOfAnySubtypeWithMinimum minimum skill skillMap = do
+    subSkillMap <- M.lookup skill skillMap
+    subSkillsAtLeast <- Just $ M.filter (\x -> x >= minimum) subSkillMap
+    keyValue <- M.findMin subSkillsAtLeast
+    Just keyValue
   applyVariableFreeSkill (Tuple m saving) (SpecificSkill skill v) = fromMaybe (Tuple m saving) $ maybeSavingFolder skill m saving v
   applyVariableFreeSkill (Tuple m saving) (OneOfTwoSkills skill1 skill2 v) = fromMaybe (Tuple m saving) $ maybeSavingFolder skill1 m saving v <|> maybeSavingFolder skill2 m saving v
   applyVariableFreeSkill (Tuple m saving) (OneOfThreeSkills skill1 skill2 skill3 v) = fromMaybe (Tuple m saving) $ maybeSavingFolder skill1 m saving v <|> maybeSavingFolder skill2 m saving v <|> maybeSavingFolder skill3 m saving v
   maybeSavingFolder skill m saving freeSkills = 
     let freeSkillPoints = costOfBuyingSkill boundaries skill freeSkills in
-    case M.lookup skill m of
-    Just x | x >= freeSkillPoints -> Just $ Tuple (M.update (\y -> Just $ y - freeSkillPoints) skill m) (saving + freeSkillPoints)
-    _                             -> Nothing
-  folder acc (Tuple skill value) = M.alter (\maybeAcc -> Just $ costOfBuyingSkill boundaries skill value + fromMaybe 0 maybeAcc) skill acc
-  costsByOuterSkills skills = foldl (folder) M.empty $ map (uncurry3 \s _ v -> Tuple s v) $ getSkillList skills
+    case skillOfAnySubtypeWithMinimum freeSkills skill m of
+    Just {key : key, value : value} | value >= freeSkills -> Just $ Tuple (M.update (\sm -> Just $ M.update (\_ -> Nothing) key sm) skill m) (saving + freeSkillPoints)
+    _                                                     -> Nothing
          
 
 

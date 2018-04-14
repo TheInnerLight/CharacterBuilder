@@ -17,7 +17,8 @@ newtype Skill = Skill
   , ability :: Ability
   }
 
-type SkillBoundaries = M.Map Skill (Tuple3 Int Int Int)
+type SkillBoundary = {cost2 :: Int, cost3 :: Int, cost4 :: Int}
+type SkillBoundaries = M.Map Skill SkillBoundary
 
 data FreeSkillBonus
   = SpecificSkill Skill Int
@@ -25,9 +26,9 @@ data FreeSkillBonus
   | OneOfThreeSkills Skill Skill Skill Int
 
 instance freeSkillBonusShow :: Show FreeSkillBonus where
-  show (SpecificSkill (Skill skill) value) = show value <> " skill points in " <> skill.name
-  show (OneOfTwoSkills (Skill skill1) (Skill skill2) value) = show value <> " skill points in " <> skill1.name <> " or " <> skill2.name
-  show (OneOfThreeSkills (Skill skill1) (Skill skill2) (Skill skill3) value) = show value <> " skill points in " <> skill1.name <> " or " <> skill2.name <> " or " <> skill3.name
+  show (SpecificSkill (Skill skill) value) = show value <> " free ranks in one " <> skill.name <> " field skill"
+  show (OneOfTwoSkills (Skill skill1) (Skill skill2) value) = show value <> " free ranks in one " <> skill1.name <> " or " <> skill2.name <> " field skill"
+  show (OneOfThreeSkills (Skill skill1) (Skill skill2) (Skill skill3) value) = show value <> " free ranks in one " <> skill1.name <> " or " <> skill2.name <> " or " <> skill3.name <> " field skill"
 
 derive instance newtypeSkill :: Newtype Skill _
 derive instance eqSkill :: Eq Skill
@@ -35,17 +36,20 @@ derive instance ordSkill :: Ord Skill
 derive instance eqSkillType :: Eq SkillType
 derive instance ordSkillType :: Ord SkillType
 
+defaultSkillBoundary :: SkillBoundary
+defaultSkillBoundary = {cost2 : 3, cost3: 6, cost4: 9}
+
 costOfBuyingSkill :: SkillBoundaries -> Skill -> Int -> Int
 costOfBuyingSkill boundaries skill value =
-  let boundary = fromMaybe (tuple3 3 6 9) $ M.lookup skill $ boundaries in 
-  uncurry3 (costWithBounds value) boundary
+  let boundary = fromMaybe defaultSkillBoundary $ M.lookup skill $ boundaries in 
+  costWithBounds value boundary
   where
-  costWithBounds value bound1 bound2 bound3 = 
+  costWithBounds value {cost2 : bound1, cost3 : bound2, cost4 : bound3} = 
     case value of
-      v | v < bound1 -> v
-      v | v < bound2 -> bound1 + (v - bound1) * 2
-      v | v < bound3 -> bound1 + (bound2 - bound1) * 2 + (v - bound2) * 3
-      v              -> bound1 + (bound2 - bound1) * 2 + (bound3 - bound2) * 3 + (v - bound3) * 4
+      v | v <= bound1 -> v
+      v | v <= bound2 -> bound1 + (v - bound1) * 2
+      v | v <= bound3 -> bound1 + (bound2 - bound1) * 2 + (v - bound2) * 3
+      v               -> bound1 + (bound2 - bound1) * 2 + (bound3 - bound2) * 3 + (v - bound3) * 4
 
 academics :: Skill
 academics = Skill { name : "Academics", skillType : FieldSpecific, ability : Comprehension }
@@ -122,8 +126,14 @@ research = Skill { name : "Research", skillType : SingleValue, ability : Compreh
 stealth :: Skill
 stealth = Skill { name : "Stealth", skillType : SingleValue, ability : Agility }
 
+survival :: Skill
+survival = Skill { name : "Survival", skillType : SingleValue, ability : Intuition }
+
 thrownWeapons :: Skill
 thrownWeapons = Skill { name : "ThrownWeapons", skillType : SingleValue, ability : Strength }
+
+zeroG :: Skill
+zeroG = Skill { name : "Zero-G", skillType : SingleValue, ability : Agility }
 
 skills :: Array Skill
 skills =
@@ -151,5 +161,7 @@ skills =
   , rangedWeapons
   , research
   , stealth
+  , survival
   , thrownWeapons
+  , zeroG
   ]

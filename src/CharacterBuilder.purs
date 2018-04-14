@@ -78,7 +78,11 @@ remainingAbilityPoints cb = do
   compCost <- baseCostOfAbility cb.abilities.comprehension
   intCost <- baseCostOfAbility cb.abilities.intuition 
   agCost <- baseCostOfAbility cb.abilities.agility
-  Just (cb.abilityPoints - strCost - compCost - intCost - agCost)
+  Just (cb.abilityPoints + freePoints - strCost - compCost - intCost - agCost)
+  where
+  folder acc (AnyAbilityBonus bonus) = acc + bonus
+  folder acc _ = acc
+  freePoints = fromMaybe 0 $ map (\r -> foldl (folder) 0 r.advantages) cb.race
 
 remainingSkillPoints :: CharacterBuilder -> Int
 remainingSkillPoints cb =
