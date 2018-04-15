@@ -3,7 +3,6 @@ module CharacterBuilder where
 import Abilities
 import Background
 import Control.Alt
-import Data.Array as A
 import Data.List
 import Data.Maybe
 import Data.Tuple
@@ -12,8 +11,11 @@ import Prelude
 import Races
 import Skills
 
+import Data.Array as A
+import Data.Int (floor, round, toNumber)
 import Data.Map as M
-import SkillMap (costOfSkills, mapToArray, valueOfFreeSkills)
+import Math (sqrt)
+import SkillMap (SkillMap, costOfSkills, getSkillList, mapToArray, valueOfFreeSkills)
 import SkillMap as SM
 
 type CharacterBuilder = 
@@ -47,30 +49,26 @@ transformSkill :: Skill -> Maybe String -> (Int -> Int) -> CharacterBuilder -> C
 transformSkill skill maybeSubskill f cb =
   cb { skills = SM.update skill maybeSubskill (f) cb.skills }
 
-applyRacialStatBonus :: Race -> DerivedAbilities -> DerivedAbilities
-applyRacialStatBonus race pa =
-  foldl folder pa race.advantages
+applyRacialStatBonus :: CharacterBuilder -> DerivedAbilities -> DerivedAbilities
+applyRacialStatBonus cb pa =
+  foldl (\_ race -> foldl disAdvFolder (foldl advFolder pa race.advantages) race.disadvantages) pa cb.race
   where 
-  folder acc (AbilityBonus Strength v) = acc {strength = acc.strength + v}
-  folder acc (AbilityBonus Agility v) = acc {agility = acc.agility + v}
-  folder acc (AbilityBonus Intuition v) = acc {intuition = acc.intuition + v}
-  folder acc (AbilityBonus Comprehension v) = acc {comprehension = acc.comprehension + v}
-  folder acc (AbilityBonus Health v) = acc {health = acc.health + v}
-  folder acc (AbilityBonus Resolve v) = acc {resolve = acc.resolve + v}
-  folder acc _ = acc
+  advFolder da (AbilityBonus ab v) = transformDerivedAbility ab (\x -> x + v) da
+  advFolder da _ = da
+  disAdvFolder da (AbilityPenalty ab v) = transformDerivedAbility ab (\x -> x - v) da
+  disAdvFolder da _ = da
+
+applySkillStatBonuses :: CharacterBuilder -> DerivedAbilities -> DerivedAbilities
+applySkillStatBonuses cb da =
+  foldl mapFolder da (mapToArray $ foldl skillFolder M.empty $ getSkillList cb.skills)
+  where
+  mapFolder acc (Tuple ability value) = transformDerivedAbility ability (abilityDiff value) acc
+  skillFolder acc {skill : (Skill skill), subSkill : _, value: v} = M.alter (\o -> Just $ fromMaybe v $ map (\x -> x + v) o) skill.ability acc
+  abilityDiff points oldAbility = floor $ sqrt(toNumber(oldAbility * oldAbility) + toNumber(points) / 2.5)
 
 calculateDerivedAbilities :: CharacterBuilder -> DerivedAbilities
 calculateDerivedAbilities cb = 
-  foldl (\acc race -> applyRacialStatBonus race acc) baseDerivedAbilities cb.race
-  where
-  baseDerivedAbilities = 
-    { strength : cb.abilities.strength
-    , agility : cb.abilities.agility
-    , intuition : cb.abilities.intuition
-    , comprehension : cb.abilities.comprehension
-    , health : (cb.abilities.strength + cb.abilities.agility)/2
-    , resolve : (cb.abilities.intuition + cb.abilities.comprehension)/2
-    }
+  applySkillStatBonuses cb <<< applyRacialStatBonus cb $ baseDerivedAbilities cb.abilities
 
 remainingAbilityPoints :: CharacterBuilder -> Maybe Int
 remainingAbilityPoints cb = do

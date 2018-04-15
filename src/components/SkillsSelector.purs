@@ -60,11 +60,11 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
   reactElem subskills
   where 
   singleReactElement (Tuple (Just subskill) v) = 
-    [ R.p [ RP.className "Skill"]
-          [ R.text   $ skill.name <> " (" <> subskill <> ")" <> ": "
-          , R.text   $ show v
+    [ R.p [ RP.className "skill"]
+          [ R.text   $ skill.name <> " (" <> subskill <> ") [" <> show skill.ability <> "]: "
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Just subskill)
+                  [ R.text   $ show v 
+                  ,  R.button [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Just subskill)
                               , RP.disabled $ not $ isIncreasable wrappedSkill (Just subskill) cb ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Just subskill) 
@@ -77,11 +77,11 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
           ]
     ]
   singleReactElement (Tuple Nothing v) = 
-    [ R.p [ RP.className "Skill"]
-          [ R.text   $ skill.name <> ": "
-          , R.text   $ show v
+    [ R.p [ RP.className "skill"]
+          [ R.text   $ skill.name <> " [" <> show skill.ability <> "]: "
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Nothing)
+                  [ R.text   $ show v
+                  , R.button  [ RP.onClick \_ -> dispatch (IncreaseSkill wrappedSkill $ Nothing)
                               , RP.disabled $ not $ isIncreasable wrappedSkill Nothing cb ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseSkill wrappedSkill $ Nothing) 
@@ -91,14 +91,14 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
           ]
     ]
   wrappedSkill = Skill skill  
-  reactElem subskills = R.p [ RP.className skill.name ] $
+  reactElem subskills = R.p [ RP.className "skill" ] $
     case skill.skillType of
       FieldSpecific -> 
         A.concat [ bind (mapToArray subskills) singleReactElement
                  , [ R.p  [ RP.hidden $ not $ remainingSkillPoints cb > 0 ]
                           [  R.text $ skill.name <> " ("
                           ,  R.input [ RP.onKeyUp \e -> handleKeyPress (unsafeCoerce e).keyCode (unsafeCoerce e).target.value]
-                                    []
+                                     []
                           , R.text ")"
                           ]
                     ]

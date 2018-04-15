@@ -45,7 +45,7 @@ initialSkills =
 initialState :: CharacterBuilder
 initialState = 
   { abilityPoints : 10
-  , skillPoints  : 52
+  , skillPoints  : 55
   , abilities : {strength : 2, comprehension : 2, intuition : 2, agility : 2}
   , skills : initialSkills
   , background : Nothing

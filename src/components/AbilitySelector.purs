@@ -40,9 +40,9 @@ render dispatch _ state _ =
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Strength: "
-          , R.text   $ show derivedAbilities.strength
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Strength)
+                  [ R.text   $ show derivedAbilities.strength
+                  , R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Strength)
                               , RP.disabled $ not $ isIncreasable Strength state ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseAbilityScore Strength) 
@@ -53,9 +53,9 @@ render dispatch _ state _ =
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Agility: "
-          , R.text   $ show derivedAbilities.agility
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Agility)
+                  [ R.text   $ show derivedAbilities.agility 
+                  , R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Agility)
                               , RP.disabled $ not $ isIncreasable Agility state ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseAbilityScore Agility) 
@@ -66,9 +66,9 @@ render dispatch _ state _ =
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Comprehension: "
-          , R.text   $ show derivedAbilities.comprehension
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Comprehension)
+                  [ R.text   $ show derivedAbilities.comprehension
+                  , R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Comprehension)
                               , RP.disabled $ not $ isIncreasable Comprehension state ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseAbilityScore Comprehension) 
@@ -79,9 +79,9 @@ render dispatch _ state _ =
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Intuition: "
-          , R.text   $ show derivedAbilities.intuition
           , R.div [ RP.className "plus-minus-button"]
-                  [ R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Intuition)
+                  [ R.text   $ show derivedAbilities.intuition
+                  , R.button  [ RP.onClick \_ -> dispatch (IncreaseAbilityScore Intuition)
                               , RP.disabled $ not $ isIncreasable Intuition state ]
                               [ R.text "+" ]
                   , R.button  [ RP.onClick \_ -> dispatch (DecreaseAbilityScore Intuition) 
@@ -92,12 +92,12 @@ render dispatch _ state _ =
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Health: "
-          , R.text   $ show derivedAbilities.health
+          , R.div [ RP.className "plus-minus-button"] [ R.text   $ show derivedAbilities.health ]
           ]
       , R.p [ RP.className "ability-score" ] 
           [ 
           R.text     $ "Resolve: "
-          , R.text   $ show derivedAbilities.resolve
+          , R.div [ RP.className "plus-minus-button"] [ R.text   $ show derivedAbilities.resolve ]
           ]    
     ]
   ]

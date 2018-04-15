@@ -9,7 +9,7 @@ import Data.Map as M
 import Data.Maybe (Maybe(..), fromMaybe)
 import Data.Tuple (Tuple(..), snd)
 import Data.Tuple.Nested (Tuple3, tuple3, uncurry3)
-import Skills (FreeSkillBonus(..), Skill, SkillBoundaries, costOfBuyingSkill)
+import Skills (FreeSkillBonus(..), Skill, SkillBoundaries, SkillValue, costOfBuyingSkill)
 
 type SkillMap = M.Map Skill (M.Map (Maybe String) Int)
 
@@ -46,13 +46,13 @@ getSkillValue skill maybeString skillMap = do
   value <- M.lookup maybeString subSkillMap
   Just value
 
-getSkillList :: SkillMap -> L.List (Tuple3 Skill (Maybe String) Int)
+getSkillList :: SkillMap -> L.List SkillValue
 getSkillList skillMap = foldl folder L.Nil $ mapToArray skillMap
   where
-  folder acc (Tuple k v) = append (map (\(Tuple s v) -> tuple3 k s v) (L.fromFoldable $ mapToArray v)) acc
+  folder acc (Tuple k v) = append (map (\(Tuple s v) -> {skill : k, subSkill : s, value: v}) (L.fromFoldable $ mapToArray v)) acc
 
 costOfSkills :: SkillBoundaries -> SkillMap -> Int
-costOfSkills boundaries skills = foldl (\acc -> uncurry3 (\skill _ value -> acc + costOfBuyingSkill boundaries skill value)) 0 $ getSkillList skills
+costOfSkills boundaries skills = foldl (\acc {skill : skill, subSkill : _, value : value} -> acc + costOfBuyingSkill boundaries skill value) 0 $ getSkillList skills
 
 valueOfFreeSkills :: SkillBoundaries -> Array FreeSkillBonus -> SkillMap -> Int
 valueOfFreeSkills boundaries freeSkills skills =

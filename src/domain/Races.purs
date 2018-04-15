@@ -24,10 +24,12 @@ instance showAdvantage :: Show Advantage where
 data Disadvantage 
   = NoAutomaticLanguage
   | IllegalGeneticStatus
+  | AbilityPenalty Ability Int
 
 instance showDisadvantage :: Show Disadvantage where
   show NoAutomaticLanguage  = "No starting language skills."
   show IllegalGeneticStatus = "Illegal Genetic Status."
+  show (AbilityPenalty ability penality) = "-" <> show penality <> " penalty to " <> show ability <> " score."
 
 type Race =
   { skillBoundaries :: M.Map Skill SkillBoundary
@@ -196,6 +198,17 @@ ferengi =
   , name : "Ferengi"
   }
 
+gorn :: Race
+gorn =
+  { skillBoundaries :
+    M.fromFoldable
+    [ Tuple melee      (increasedBy 1)]
+  , fate : 1
+  , advantages : [AbilityBonus Strength 2, AbilityBonus Health 1]
+  , disadvantages : [AbilityPenalty Agility 1]
+  , name : "Gorn"
+  }
+
 grazerite :: Race
 grazerite =
   { skillBoundaries :
@@ -347,6 +360,7 @@ races =
   , deltan
   , efrosian
   , ferengi
+  , gorn
   , grazerite
   , haliian
   , human
