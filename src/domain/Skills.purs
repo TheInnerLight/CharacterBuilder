@@ -17,6 +17,11 @@ newtype Skill = Skill
   , ability :: Ability
   }
 
+type SkillValue = 
+  { skill :: Skill
+  , subSkill :: Maybe String
+  , value :: Int}
+
 type SkillBoundary = {cost2 :: Int, cost3 :: Int, cost4 :: Int}
 type SkillBoundaries = M.Map Skill SkillBoundary
 
@@ -118,7 +123,7 @@ protocol :: Skill
 protocol = Skill { name : "Protocol", skillType : SingleValue, ability : Intuition }
 
 rangedWeapons :: Skill
-rangedWeapons = Skill { name : "RangedWeapons", skillType : FieldSpecific, ability : Agility }
+rangedWeapons = Skill { name : "Ranged Weapons", skillType : FieldSpecific, ability : Agility }
 
 research :: Skill
 research = Skill { name : "Research", skillType : SingleValue, ability : Comprehension }
@@ -130,7 +135,7 @@ survival :: Skill
 survival = Skill { name : "Survival", skillType : SingleValue, ability : Intuition }
 
 thrownWeapons :: Skill
-thrownWeapons = Skill { name : "ThrownWeapons", skillType : SingleValue, ability : Strength }
+thrownWeapons = Skill { name : "Thrown Weapons", skillType : SingleValue, ability : Strength }
 
 zeroG :: Skill
 zeroG = Skill { name : "Zero-G", skillType : SingleValue, ability : Agility }

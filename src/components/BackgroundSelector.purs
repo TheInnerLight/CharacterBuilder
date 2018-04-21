@@ -36,7 +36,7 @@ optionElementFromBackground dispatch background =
 backgroundSelector :: T.Render CharacterBuilder _ _
 backgroundSelector dispatch _ state _ =
   [ R.div [ RP.className "character-builder-component"]
-    [ R.p' 
+    [ R.div [ RP.className "title-and-selector"] 
       [ R.text "Background: "
       , R.select  [RP.className "background-selector"
                   , RP.onChange (\e -> dispatch $ SelectBackground $ selectionStringToBackground (unsafeCoerce e).target.value) ]
@@ -45,7 +45,7 @@ backgroundSelector dispatch _ state _ =
                     , map (optionElementFromBackground dispatch) backgrounds]
                   )
       ]
-      , R.p' 
+      , R.div'
           case state.background of
             Just background -> A.concat 
               [ map (\x -> R.p' [R.text $ show x]) background.freeSkillBonuses

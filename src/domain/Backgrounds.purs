@@ -35,6 +35,24 @@ andorianAcademy =
     , SM.singleSkill protocol 3
     ]
 
+bajoranResistance ::  Background
+bajoranResistance = 
+  { startingSkills : skills
+  , name : "Bajoran Resistance"
+  , freeSkillBonuses : [SpecificSkill engineering 2, SpecificSkill profession 2]
+  }
+  where 
+  skills = 
+    foldr (\(Tuple k v) -> M.insert k v) (SM.empty)
+    [ SM.singleSkill deception 2
+    , SM.singleSkill demolitions 4
+    , SM.relatedSkills language  $ M.fromFoldable [Tuple "Cardassian" 2]
+    , SM.relatedSkills melee $ M.fromFoldable [Tuple "Unarmed" 2]
+    , SM.singleSkill operations 3
+    , SM.relatedSkills rangedWeapons  $ M.fromFoldable [Tuple "Disruptors" 3]
+    , SM.singleSkill survival 3
+    ]
+
 daystromInstitute :: Background
 daystromInstitute = 
   { startingSkills : skills

@@ -41,16 +41,18 @@ optionElementFromRace dispatch race =
 raceSelector :: T.Render CharacterBuilder _ _
 raceSelector dispatch _ state _ =
   [ R.div [ RP.className "character-builder-component"]
+    [ R.div [ RP.className "title-and-selector"]
       [ R.text "Race: "
-        , R.select [ RP.className "race-selector"
-                   , RP.onChange (\e -> dispatch $ SelectRace $ selectionStringToRace (unsafeCoerce e).target.value) ]
-        (A.concat [
-            [ R.option [ RP.value "Nothing"]
-                       [ R.text ("----")]
-            ]
-            , map (optionElementFromRace dispatch) races]
-        )
-      , R.p' 
+      , R.select [ RP.className "race-selector"
+                  , RP.onChange (\e -> dispatch $ SelectRace $ selectionStringToRace (unsafeCoerce e).target.value) ]
+      (A.concat
+        [ [ R.option [ RP.value "Nothing"]
+                     [ R.text ("----")]
+          ]
+        , map (optionElementFromRace dispatch) races
+        ])
+      ]
+      , R.div' 
           case state.race of
             Just race -> A.concat 
               [ map (\x -> R.p' [R.text $ show x]) race.advantages

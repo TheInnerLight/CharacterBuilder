@@ -60,7 +60,7 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
   reactElem subskills
   where 
   singleReactElement (Tuple (Just subskill) v) = 
-    [ R.p [ RP.className "skill"]
+    [ R.div [ RP.className "skill"]
           [ R.text   $ skill.name <> " (" <> subskill <> ") [" <> show skill.ability <> "]: "
           , R.div [ RP.className "plus-minus-button"]
                   [ R.text   $ show v 
@@ -77,7 +77,7 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
           ]
     ]
   singleReactElement (Tuple Nothing v) = 
-    [ R.p [ RP.className "skill"]
+    [ R.div [ RP.className "skill"]
           [ R.text   $ skill.name <> " [" <> show skill.ability <> "]: "
           , R.div [ RP.className "plus-minus-button"]
                   [ R.text   $ show v
@@ -91,7 +91,7 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
           ]
     ]
   wrappedSkill = Skill skill  
-  reactElem subskills = R.p [ RP.className "skill" ] $
+  reactElem subskills = R.div [ RP.className "skill" ] $
     case skill.skillType of
       FieldSpecific -> 
         A.concat [ bind (mapToArray subskills) singleReactElement
@@ -111,8 +111,9 @@ elementFromSkill cb dispatch (Tuple (Skill skill) subskills)  =
 skillSelector :: T.Render CharacterBuilder _ _
 skillSelector dispatch _ state _ =
   [ R.div [ RP.className "character-builder-component"]
-          [ R.p' [ R.text $ "Remaining Skill Points: " <> (show $ remainingSkillPoints state) ]  
-          , R.p'
+          [ R.div [RP.className "remaining-points"] 
+                  [ R.text $ "Remaining Skill Points: " <> (show $ remainingSkillPoints state) ]  
+          , R.div'
              (map (elementFromSkill state dispatch) skillArray)
           ]
   ]
