@@ -218,6 +218,7 @@ trillScienceMinistry = vulcanScienceAcademy {name = "Trill Science Ministry"}
 backgrounds :: Array Background
 backgrounds =
   [ andorianAcademy 
+  , bajoranResistance
   , daystromInstitute
   , formerMaquis
   , klingonDefenseAcademy

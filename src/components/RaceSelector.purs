@@ -1,19 +1,13 @@
 module RaceSelector where
 
-import Abilities
-import Data.Foldable
-import Data.Maybe
-import Data.Maybe
 import Prelude
-import Prelude
-import Races
+import Data.Maybe (Maybe(..))
+import Races (Race, races)
 import CharacterBuilder (CharacterBuilder)
 import Data.Array as A
 import React (ReactElement)
-import React as R
 import React.DOM as R
 import React.DOM.Props as RP
-import ReactDOM as RDOM
 import Thermite as T
 import Unsafe.Coerce (unsafeCoerce)
 
